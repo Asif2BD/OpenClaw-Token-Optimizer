@@ -5,6 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-02-06
+
+### Added
+- 🛸 **Local Model Fallback (Emergency Fuel Mode)**:
+  - Automatic failover to local Ollama models when cloud APIs fail
+  - Zero-cost operation during API outages, rate limits, or offline mode
+  - Works with Qwen 2.5, Llama 3.2, DeepSeek Coder, and other Ollama models
+  - Agent announces "🛸 Emergency fuel mode — running on local backup"
+- New documentation: `docs/LOCAL-FALLBACK.md` with complete setup guide
+- Ollama provider configuration examples
+- Multi-layer fallback chain support (cloud → cloud → local)
+- Per-agent fallback configuration
+
+### Changed
+- **Revised savings estimates**: Now 85-95% (was 50-80%)
+  - Context optimization: 70-90% reduction (was 50-80%)
+  - Model routing: 60-98% cost reduction (was 40-60%)
+  - Heartbeat optimization: 90-95% savings (was 50%)
+- Detailed cost analysis with real calculations and formulas
+- Updated all documentation to reflect accurate savings
+- README restructured with Local Fallback section
+
+### Fixed
+- More accurate methodology for calculating combined savings
+- Clarified multiplicative effect of context + model optimizations
+
+---
+
 ## [1.1.0] - 2026-02-06
 
 ### Added
@@ -76,6 +104,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Summary |
 |---------|------|---------|
+| 1.2.0 | 2026-02-06 | Local model fallback, revised savings (85-95%) |
 | 1.1.0 | 2026-02-06 | Multi-provider support, ClawHub-ready |
 | 1.0.0 | 2026-02-05 | Initial release |
 
