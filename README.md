@@ -2,10 +2,10 @@
 
 **Reduce OpenClaw token usage and API costs by 85-95%**
 
-An OpenClaw skill that implements smart model routing, lazy context loading, optimized heartbeats, multi-provider support, and local model fallback.
+An OpenClaw skill that implements smart model routing, lazy context loading, optimized heartbeats, and multi-provider support for maximum cost savings.
 
 [![ClawHub](https://img.shields.io/badge/ClawHub-Ready-blue)](https://clawhub.ai)
-[![Version](https://img.shields.io/badge/version-1.2.0-green)](https://github.com/Asif2BD/OpenClaw-Token-Optimizer/blob/main/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.2.2-green)](https://github.com/Asif2BD/OpenClaw-Token-Optimizer/blob/main/CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![OpenClaw](https://img.shields.io/badge/OpenClaw-Skill-purple)](https://openclaw.ai)
 
@@ -76,14 +76,6 @@ python3 ~/.openclaw/skills/token-optimizer/scripts/token_tracker.py check
 | `heartbeat_optimizer.py` | Efficient heartbeat scheduling | 90-95% |
 | `token_tracker.py` | Budget monitoring and alerts | Prevents overruns |
 
-### Local Fallback (NEW in v1.2.0)
-
-| Feature | Purpose | Benefit |
-|---------|---------|---------|
-| 🛸 Emergency Fuel Mode | Auto-fallback to local models | Zero cost when cloud fails |
-| Ollama integration | Run Qwen, Llama locally | Works offline, no rate limits |
-
-See [docs/LOCAL-FALLBACK.md](docs/LOCAL-FALLBACK.md) for full setup guide.
 
 ### Assets
 
@@ -249,11 +241,6 @@ Using Haiku instead of Opus for 10 daily cronjobs:
 ### Quick Setup
 
 ```bash
-# Install Ollama
-curl -fsSL https://ollama.ai/install.sh | sh
-
-# Pull recommended model (1.9GB)
-ollama pull qwen2.5:3b
 ```
 
 ### Configure OpenClaw
@@ -264,18 +251,12 @@ Add to `~/.openclaw/config.json`:
 {
   "models": {
     "providers": {
-      "ollama": {
-        "baseUrl": "http://localhost:11434/v1",
-        "apiKey": "ollama-local",
-        "api": "openai-completions",
-        "models": [{"id": "qwen2.5:3b", "name": "Qwen 2.5 3B (Local)"}]
       }
     }
   },
   "agents": {
     "defaults": {
       "model": {
-        "fallbacks": ["ollama/qwen2.5:3b"]
       }
     }
   }
@@ -291,7 +272,6 @@ Add to `~/.openclaw/config.json`:
 | 📡 Works offline | No internet required |
 | 🔒 Privacy | Data never leaves your machine |
 
-**Full guide:** [docs/LOCAL-FALLBACK.md](docs/LOCAL-FALLBACK.md)
 
 ---
 
@@ -303,7 +283,6 @@ See [CHANGELOG.md](CHANGELOG.md) for full version history.
 - 🛸 **Local model fallback** (Emergency Fuel Mode) with Ollama integration
 - 📊 **Revised savings estimates** — now 85-95% (was 50-80%)
 - 📝 Detailed cost analysis with real calculations
-- 📚 New `docs/LOCAL-FALLBACK.md` setup guide
 
 ### v1.1.0 (2026-02-06)
 - ✨ **Multi-provider support**: OpenAI, Google, OpenRouter
@@ -344,7 +323,6 @@ token-optimizer/
 │   ├── cronjob-model-guide.md # Cronjob model selection guide
 │   └── config-patches.json    # Advanced config examples
 ├── docs/
-│   ├── LOCAL-FALLBACK.md      # Local model setup guide (NEW!)
 │   └── RESEARCH-NOTES.md      # Research and methodology
 └── references/
     └── PROVIDERS.md           # Provider comparison guide

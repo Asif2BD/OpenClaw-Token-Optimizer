@@ -5,18 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.2.0] - 2026-02-06
+## [1.2.2] - 2026-02-06
 
-### Added
-- 🛸 **Local Model Fallback (Emergency Fuel Mode)**:
-  - Automatic failover to local Ollama models when cloud APIs fail
-  - Zero-cost operation during API outages, rate limits, or offline mode
-  - Works with Qwen 2.5, Llama 3.2, DeepSeek Coder, and other Ollama models
-  - Agent announces "🛸 Emergency fuel mode — running on local backup"
-- New documentation: `docs/LOCAL-FALLBACK.md` with complete setup guide
-- Ollama provider configuration examples
-- Multi-layer fallback chain support (cloud → cloud → local)
-- Per-agent fallback configuration
+### Security
+- **REMOVED:** Local Ollama setup instructions (flagged as high-risk by ClawHub security scan)
+  - Removed `curl -fsSL https://ollama.ai/install.sh | sh` commands
+  - Removed `docs/LOCAL-FALLBACK.md` entirely
+  - Removed all Ollama configuration examples
+  - Skill now focuses exclusively on cloud API optimization
+
+### Rationale
+ClawHub security scan flagged piping remote scripts to shell (`curl | sh`) as a potential arbitrary code execution vector. The Token Optimizer skill's primary value is cloud API cost reduction through smart routing and context optimization. Local model fallback is a separate concern and should be implemented independently with proper package manager security.
+
+---
+
+## [1.2.0] - 2026-02-06
 
 ### Changed
 - **Revised savings estimates**: Now 85-95% (was 50-80%)
@@ -25,7 +28,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Heartbeat optimization: 90-95% savings (was 50%)
 - Detailed cost analysis with real calculations and formulas
 - Updated all documentation to reflect accurate savings
-- README restructured with Local Fallback section
 
 ### Fixed
 - More accurate methodology for calculating combined savings
@@ -33,16 +35,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.1.0] - 2026-02-06
-
-### Added
-- **Multi-provider support** in `model_router.py`:
-  - OpenAI: GPT-4.1-nano → GPT-4.1-mini → GPT-4.1 → GPT-5
-  - Google: Gemini 2.0 Flash → Gemini 2.5 Flash → Gemini 2.5 Pro
-  - OpenRouter: Unified API with automatic failover
-  - Auto-detection of provider based on available API keys
-- New CLI commands for model router:
-  - `model_router.py compare` — Compare models across all providers
   - `model_router.py providers` — List available providers
   - `model_router.py detect` — Show auto-detected provider
 - Provider-agnostic tier system:
