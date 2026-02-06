@@ -1,6 +1,6 @@
 ---
 name: token-optimizer
-description: Reduce OpenClaw token usage and API costs by 85-95% through smart model routing, lazy context loading, heartbeat optimization, multi-provider support, and local model fallback. Supports Anthropic, OpenAI, Google, OpenRouter, and Ollama (local).
+description: Reduce OpenClaw token usage and API costs by 85-95% through smart model routing, lazy context loading, heartbeat optimization, multi-provider support, Supports Anthropic, OpenAI, Google, and OpenRouter.
 version: 1.2.0
 homepage: https://github.com/Asif2BD/OpenClaw-Token-Optimizer
 metadata: {"openclaw":{"emoji":"🪙","homepage":"https://github.com/Asif2BD/OpenClaw-Token-Optimizer","requires":{"bins":["python3"]}}}
@@ -194,42 +194,6 @@ export OPENROUTER_API_KEY="sk-or-v1-..."
 
 The model router auto-detects which provider to use based on available keys.
 
-### Local Model Fallback (Ollama)
-
-Set up zero-cost fallback when cloud APIs fail:
-
-```bash
-# Install Ollama
-curl -fsSL https://ollama.ai/install.sh | sh
-ollama pull qwen2.5:3b
-```
-
-Add to `~/.openclaw/config.json`:
-
-```json
-{
-  "models": {
-    "providers": {
-      "ollama": {
-        "baseUrl": "http://localhost:11434/v1",
-        "apiKey": "ollama-local",
-        "api": "openai-completions",
-        "models": [{"id": "qwen2.5:3b", "name": "Qwen 2.5 3B (Local)"}]
-      }
-    }
-  },
-  "agents": {
-    "defaults": {
-      "model": {
-        "fallbacks": ["ollama/qwen2.5:3b"]
-      }
-    }
-  }
-}
-```
-
-See [docs/LOCAL-FALLBACK.md](docs/LOCAL-FALLBACK.md) for complete setup guide.
-
 ### Customization
 
 Edit patterns in `scripts/model_router.py`:
@@ -355,7 +319,6 @@ token-optimizer/
 │   ├── cronjob-model-guide.md # Cronjob model selection guide
 │   └── config-patches.json    # Advanced config examples
 ├── docs/
-│   ├── LOCAL-FALLBACK.md      # Local model setup guide (NEW!)
 │   └── RESEARCH-NOTES.md      # Research and methodology
 └── references/
     └── PROVIDERS.md           # Provider comparison guide
