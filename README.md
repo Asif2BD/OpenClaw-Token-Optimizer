@@ -108,7 +108,7 @@ The skill supports multiple AI providers with automatic detection:
 | Provider | Cheap Tier | Balanced Tier | Smart Tier |
 |----------|------------|---------------|------------|
 | **Anthropic** | claude-haiku-4 | claude-sonnet-4-5 | claude-opus-4 |
-| **OpenAI** | gpt-4.1-nano | gpt-4.1-mini | gpt-4.1 |
+| **OpenAI** | gpt-4.1-nano | gpt-4.1-mini | gpt-5.2 |
 | **Google** | gemini-2.0-flash | gemini-2.5-flash | gemini-2.5-pro |
 | **OpenRouter** | gemini-2.0-flash | claude-sonnet-4-5 | claude-opus-4 |
 

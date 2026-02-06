@@ -43,13 +43,11 @@ PROVIDER_MODELS = {
     "openai": {
         "cheap": "openai/gpt-4.1-nano",
         "balanced": "openai/gpt-4.1-mini",
-        "smart": "openai/gpt-4.1",
-        "premium": "openai/gpt-5",
+        "smart": "openai/gpt-5.2",
         "costs": {
             "cheap": 0.10,
             "balanced": 0.40,
-            "smart": 2.00,
-            "premium": 10.00
+            "smart": 5.00
         }
     },
     "google": {
