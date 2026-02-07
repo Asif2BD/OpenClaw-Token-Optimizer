@@ -1,7 +1,7 @@
 ---
 name: token-optimizer
 description: Reduce OpenClaw token usage and API costs by 85-95% through smart model routing, lazy context loading, heartbeat optimization, multi-provider support, Supports Anthropic, OpenAI, Google, and OpenRouter.
-version: 1.2.3
+version: 1.2.4
 homepage: https://github.com/Asif2BD/OpenClaw-Token-Optimizer
 metadata: {"openclaw":{"emoji":"🪙","homepage":"https://github.com/Asif2BD/OpenClaw-Token-Optimizer","requires":{"bins":["python3"]}}}
 ---
@@ -59,6 +59,47 @@ cp ~/.openclaw/skills/token-optimizer/assets/HEARTBEAT.template.md ~/.openclaw/w
 ```bash
 python3 ~/.openclaw/skills/token-optimizer/scripts/token_tracker.py check
 ```
+
+---
+
+## ⚠️ Model Availability
+
+**Not all users have access to all model tiers.** Some configurations only support Sonnet and Opus (no Haiku).
+
+### Sonnet/Opus Only Setup
+
+If you only have Sonnet and Opus available:
+
+```bash
+# Set environment variable
+export AVAILABLE_TIERS="balanced,smart"
+
+# Or create config file at ~/.openclaw/token-optimizer.json:
+{
+  "available_tiers": ["balanced", "smart"]
+}
+```
+
+The router will automatically:
+- Skip suggestions for `cheap` tier (Haiku)
+- Upgrade simple tasks to `balanced` tier (Sonnet)
+- Explain when a tier fallback occurred
+
+### Why Haiku Might Not Work
+
+Common reasons:
+- API key doesn't include Haiku access
+- Using a provider that doesn't offer Haiku-tier models
+- Rate limits on cheaper models
+
+### Fallback Behavior
+
+| Requested | Available Tiers | Actual |
+|-----------|-----------------|--------|
+| cheap | balanced, smart | balanced |
+| balanced | balanced, smart | balanced |
+| smart | balanced, smart | smart |
+| cheap | smart only | smart |
 
 ---
 

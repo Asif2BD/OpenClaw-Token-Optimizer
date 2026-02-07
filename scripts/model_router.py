@@ -4,11 +4,81 @@ Smart model router - routes tasks to appropriate models based on complexity.
 Supports multiple providers: Anthropic, OpenAI, Google, OpenRouter.
 Helps reduce token costs by using cheaper models for simpler tasks.
 
-Version: 1.1.0
+Version: 1.2.0
+
+Model Availability Configuration:
+  - Set AVAILABLE_TIERS="balanced,smart" if you only have Sonnet/Opus
+  - Set AVAILABLE_TIERS="cheap,balanced,smart" for full tier support (default)
+  - Haiku (cheap tier) may not be available in all configurations
 """
 import re
 import os
 import json
+
+# ============================================================================
+# MODEL AVAILABILITY CONFIGURATION
+# ============================================================================
+
+def get_available_tiers():
+    """
+    Get list of available model tiers.
+    
+    Configure via:
+      - AVAILABLE_TIERS env var: "balanced,smart" (Sonnet/Opus only)
+      - Default: all tiers available
+    
+    Returns: list of tier names ['cheap', 'balanced', 'smart']
+    """
+    tiers_env = os.environ.get("AVAILABLE_TIERS", "").strip()
+    if tiers_env:
+        return [t.strip().lower() for t in tiers_env.split(",") if t.strip()]
+    
+    # Check for config file
+    config_paths = [
+        os.path.expanduser("~/.openclaw/token-optimizer.json"),
+        os.path.join(os.path.dirname(__file__), "..", "assets", "config.json")
+    ]
+    for config_path in config_paths:
+        if os.path.exists(config_path):
+            try:
+                with open(config_path) as f:
+                    config = json.load(f)
+                    if "available_tiers" in config:
+                        return config["available_tiers"]
+            except:
+                pass
+    
+    # Default: all tiers available
+    return ["cheap", "balanced", "smart"]
+
+def get_fallback_tier(requested_tier, available_tiers):
+    """
+    Get the best available tier when requested tier isn't available.
+    
+    Fallback order:
+      - cheap → balanced → smart (upgrade if cheap unavailable)
+      - smart → balanced → cheap (downgrade if needed)
+    """
+    tier_order = ["cheap", "balanced", "smart"]
+    
+    if requested_tier in available_tiers:
+        return requested_tier
+    
+    # Find the nearest available tier
+    try:
+        req_idx = tier_order.index(requested_tier)
+    except ValueError:
+        return available_tiers[0] if available_tiers else "balanced"
+    
+    # Try higher tiers first (upgrade), then lower (downgrade)
+    for i in range(req_idx, len(tier_order)):
+        if tier_order[i] in available_tiers:
+            return tier_order[i]
+    for i in range(req_idx - 1, -1, -1):
+        if tier_order[i] in available_tiers:
+            return tier_order[i]
+    
+    return available_tiers[0] if available_tiers else "balanced"
 
 # ============================================================================
 # PROVIDER CONFIGURATION
@@ -283,14 +353,22 @@ def route_task(prompt, current_model=None, force_tier=None, provider=None):
     
     Returns:
         dict with routing decision
+        
+    Model Availability:
+        Set AVAILABLE_TIERS env var to limit available tiers.
+        Example: AVAILABLE_TIERS="balanced,smart" for Sonnet/Opus only setups.
     """
     # Auto-detect provider if not specified
     if provider is None:
         provider = detect_provider()
     
+    # Get available tiers for this setup
+    available_tiers = get_available_tiers()
+    
     # Set default current model
     if current_model is None:
-        current_model = get_model_for_tier("balanced", provider)
+        default_tier = "balanced" if "balanced" in available_tiers else available_tiers[0]
+        current_model = get_model_for_tier(default_tier, provider)
     
     if force_tier:
         tier = normalize_tier(force_tier)
@@ -298,6 +376,14 @@ def route_task(prompt, current_model=None, force_tier=None, provider=None):
         reasoning = "User-specified tier"
     else:
         tier, confidence, reasoning = classify_task(prompt)
+    
+    # Check if requested tier is available, fallback if not
+    original_tier = tier
+    tier = get_fallback_tier(tier, available_tiers)
+    
+    # Update reasoning if tier was changed due to availability
+    if tier != original_tier:
+        reasoning = f"{reasoning} (Note: {original_tier} tier unavailable, using {tier})"
     
     recommended_model = get_model_for_tier(tier, provider)
     
@@ -312,6 +398,7 @@ def route_task(prompt, current_model=None, force_tier=None, provider=None):
         "current_model": current_model,
         "recommended_model": recommended_model,
         "tier": tier,
+        "original_tier": original_tier,
         "tier_display": {
             "cheap": "Cheap (Haiku/Nano/Flash)",
             "balanced": "Balanced (Sonnet/Mini/Flash)",
@@ -322,6 +409,8 @@ def route_task(prompt, current_model=None, force_tier=None, provider=None):
         "reasoning": reasoning,
         "cost_savings_percent": max(0, cost_savings),
         "should_switch": recommended_model != current_model,
+        "available_tiers": available_tiers,
+        "tier_was_fallback": tier != original_tier,
         "all_providers": {
             p: get_model_for_tier(tier, p) for p in PROVIDER_MODELS.keys()
         }

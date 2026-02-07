@@ -1,14 +1,21 @@
 # HEARTBEAT.md - Token-Optimized Template
 
 ## 🔥 Model Override (CRITICAL!)
-**This heartbeat should ALWAYS run on Haiku** — never Sonnet/Opus.
+Use the **cheapest available model** for heartbeats — never Opus!
 
-Set model override for this session:
+### If you have Haiku (recommended):
 ```
 session_status model=anthropic/claude-haiku-4
 ```
 
-Or in OpenClaw config, set heartbeat sessions to use Haiku by default.
+### If you only have Sonnet/Opus (no Haiku):
+```
+session_status model=anthropic/claude-sonnet-4-5
+```
+*Note: Sonnet is 12x more expensive than Haiku. Keep heartbeats brief!*
+
+### Configure in OpenClaw:
+Set heartbeat sessions to use your cheapest available model by default.
 
 **Rationale:** Heartbeat checks are routine monitoring — don't waste expensive model tokens!
 

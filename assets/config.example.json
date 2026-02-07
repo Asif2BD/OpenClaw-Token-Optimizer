@@ -4,6 +4,9 @@
   
   "provider": "anthropic",
   
+  "available_tiers": ["cheap", "balanced", "smart"],
+  "_available_tiers_note": "Set to ['balanced', 'smart'] if Haiku is unavailable",
+  
   "budgets": {
     "daily": 100000,
     "monthly": 2000000,
@@ -18,7 +21,9 @@
   
   "heartbeat": {
     "interval_minutes": 30,
-    "batch_checks": true
+    "batch_checks": true,
+    "model": "anthropic/claude-haiku-4",
+    "_model_note": "Use claude-sonnet-4-5 if Haiku unavailable"
   },
   
   "context": {

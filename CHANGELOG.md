@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.4] - 2026-02-07
+
+### Added
+- **Model Availability Configuration**
+  - `AVAILABLE_TIERS` env var for limiting available model tiers
+  - `available_tiers` in config file (`~/.openclaw/token-optimizer.json`)
+  - Automatic fallback when requested tier is unavailable
+  - Supports "Sonnet/Opus only" setups (no Haiku)
+- **Fallback Logic**
+  - Routes to next-best available tier when preferred unavailable
+  - Clear messaging when tier fallback occurs
+
+### Changed
+- `model_router.py` now checks available tiers before routing
+- Route results include `available_tiers` and `tier_was_fallback` fields
+- SKILL.md includes Model Availability section with configuration examples
+- HEARTBEAT.template.md provides Sonnet alternative for non-Haiku setups
+- config.example.json includes `available_tiers` option
+
+### Fixed
+- No longer suggests Haiku when it's not available
+- Graceful handling of limited-model configurations
+
+---
+
 ## [1.2.3] - 2026-02-07
 
 ### Added

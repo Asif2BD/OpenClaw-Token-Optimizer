@@ -5,7 +5,7 @@
 An OpenClaw skill that implements smart model routing, lazy context loading, optimized heartbeats, and multi-provider support for maximum cost savings.
 
 [![ClawHub](https://img.shields.io/badge/ClawHub-Ready-blue)](https://clawhub.ai)
-[![Version](https://img.shields.io/badge/version-1.2.3-green)](https://github.com/Asif2BD/OpenClaw-Token-Optimizer/blob/main/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.2.4-green)](https://github.com/Asif2BD/OpenClaw-Token-Optimizer/blob/main/CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![OpenClaw](https://img.shields.io/badge/OpenClaw-Skill-purple)](https://openclaw.ai)
 
