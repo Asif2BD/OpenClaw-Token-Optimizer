@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.3] - 2026-02-07
+
+### Added
+- **CLI Wrapper Script** (`scripts/optimize.sh`)
+  - One command for all tools: `./optimize.sh route "prompt"`
+  - Subcommands: route, context, recommend, budget, heartbeat, providers, detect
+  - Help system with examples
+- **Configuration Example** (`assets/config.example.json`)
+  - Template for custom configuration
+  - Budget settings, model overrides, heartbeat config
+
+### Changed
+- SKILL.md version updated to match package version
+- Applied patterns from Mission Control for better CLI experience
+
+---
+
 ## [1.2.2] - 2026-02-06
 
 ### Security
