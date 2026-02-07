@@ -5,7 +5,7 @@
 An OpenClaw skill that implements smart model routing, lazy context loading, optimized heartbeats, and multi-provider support for maximum cost savings.
 
 [![ClawHub](https://img.shields.io/badge/ClawHub-Ready-blue)](https://clawhub.ai)
-[![Version](https://img.shields.io/badge/version-1.2.2-green)](https://github.com/Asif2BD/OpenClaw-Token-Optimizer/blob/main/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.2.3-green)](https://github.com/Asif2BD/OpenClaw-Token-Optimizer/blob/main/CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![OpenClaw](https://img.shields.io/badge/OpenClaw-Skill-purple)](https://openclaw.ai)
 
@@ -24,6 +24,32 @@ git clone https://github.com/Asif2BD/OpenClaw-Token-Optimizer.git ~/.openclaw/sk
 > "Install the token-optimizer skill from github.com/Asif2BD/OpenClaw-Token-Optimizer"
 
 Your agent will clone it to the skills directory automatically.
+
+---
+
+## 🛠️ CLI Wrapper (Easy Mode)
+
+Use the unified CLI wrapper for quick access to all tools:
+
+```bash
+cd ~/.openclaw/skills/token-optimizer/scripts
+
+# Route a prompt to appropriate model
+./optimize.sh route "thanks!"           # → cheap tier (Haiku)
+./optimize.sh route "design an API"     # → smart tier (Opus)
+
+# Generate optimized AGENTS.md
+./optimize.sh context
+
+# Check token budget
+./optimize.sh budget
+
+# Install optimized heartbeat
+./optimize.sh heartbeat
+
+# See all commands
+./optimize.sh help
+```
 
 ---
 

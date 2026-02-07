@@ -1,7 +1,7 @@
 ---
 name: token-optimizer
 description: Reduce OpenClaw token usage and API costs by 85-95% through smart model routing, lazy context loading, heartbeat optimization, multi-provider support, Supports Anthropic, OpenAI, Google, and OpenRouter.
-version: 1.2.0
+version: 1.2.3
 homepage: https://github.com/Asif2BD/OpenClaw-Token-Optimizer
 metadata: {"openclaw":{"emoji":"🪙","homepage":"https://github.com/Asif2BD/OpenClaw-Token-Optimizer","requires":{"bins":["python3"]}}}
 ---
