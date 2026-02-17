@@ -1,5 +1,12 @@
 {
   "description": "Token optimization config patches for OpenClaw",
+  "_notice": "IMPORTANT: This file is reference documentation only — it is not executed automatically. Patches marked requires_external_api require you to obtain and configure API keys from third-party providers. Patches marked local_only use no network access. Review each patch before applying.",
+  "_categories": {
+    "local_only": ["heartbeat_optimization", "token_budgets", "lazy_context_loading"],
+    "requires_openrouter_api_key": ["multi_provider_fallback"],
+    "requires_anthropic_beta": ["enable_prompt_caching"],
+    "partial_core_support": ["model_routing"]
+  },
   "patches": {
     "enable_prompt_caching": {
       "description": "Enable Anthropic prompt caching for SOUL.md, AGENTS.md, and docs",
@@ -100,6 +107,8 @@
     },
     "multi_provider_fallback": {
       "description": "Automatic fallback to alternative providers when rate-limited",
+      "_requires_external_api": true,
+      "_warning": "This patch requires OPENROUTER_API_KEY and/or TOGETHER_API_KEY environment variables. These are credentials for third-party services (openrouter.ai, together.ai) that involve network requests. Do NOT apply unless you have registered for and obtained these keys. The executable scripts in this skill do NOT use this patch.",
       "patch": {
         "providers": [
           {
