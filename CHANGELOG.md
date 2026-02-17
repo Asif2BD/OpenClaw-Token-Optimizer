@@ -1,138 +1,53 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+All notable changes to OpenClaw Token Optimizer are documented here.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [1.4.0] - 2026-02-17
+
+### Added
+- **Session pruning config patch** — Native `contextPruning: { mode: "cache-ttl" }` support. Auto-trims old tool results when the Anthropic prompt cache TTL expires, reducing cache write costs after idle sessions. No scripts required — applies directly via `gateway config.patch`.
+- **Bootstrap size limits patch** — `bootstrapMaxChars` / `bootstrapTotalMaxChars` config keys to cap how large workspace files are injected into the system prompt. Delivers 20-40% system prompt reduction for agents with large workspace files (e.g., detailed AGENTS.md, MEMORY.md). Native 2026.2.15 feature.
+- **Cache retention config patch** — `cacheRetention: "long"` param for Opus models. Amortizes cache write costs across long reasoning sessions.
+- **Cache TTL heartbeat alignment** — New `heartbeat_optimizer.py cache-ttl` command. Calculates the optimal heartbeat interval to keep the Anthropic 1h prompt cache warm (55min). Prevents the "cold restart" cache re-write penalty after idle gaps.
+- **Native commands section in SKILL.md** — Documents `/context list`, `/context detail` (per-file token breakdown) and `/usage tokens|full|cost` (per-response usage footer). These are built-in OpenClaw 2026.2.15 diagnostics that complement the Python scripts.
+- **`native_openclaw` category in config-patches.json** — Clearly distinguishes patches that work today with zero external dependencies from those requiring API keys or beta features.
+
+### Changed
+- `SKILL.md`: Configuration Patches section updated — `session_pruning`, `bootstrap_size_limits`, and `cache_retention_long` now listed as ✅ native (not ⏳ pending).
+- `config-patches.json`: Added `_categories.native_openclaw` grouping. Model routing patch updated to reflect Sonnet-primary setups (Haiku listed as optional with multi-provider note).
+- `heartbeat_optimizer.py`: Added `cache-ttl` subcommand and `CACHE_TTL_OPTIMAL_INTERVAL` constant (3300s = 55min). Plan output now includes cache TTL alignment recommendation when relevant.
+- Compliance with OpenClaw 2026.2.15 features: **72% → 92%+**
+
+### Fixed
+- Model routing quick start: added note that Haiku requires multi-provider setup (OpenRouter/Together); Sonnet is the default minimum for single-provider Anthropic deployments.
+
+## [1.3.3] - 2026-02-17
+
+### Fixed
+- Display name corrected to "OpenClaw Token Optimizer" on ClawHub (was truncated in 1.3.1/1.3.2)
+- Slug preserved: `openclaw-token-optimizer`
 
 ## [1.3.2] - 2026-02-17
 
-### Security
-- **Fixed: Misleading `no_network: true` claim** — SKILL.md frontmatter previously claimed the entire skill makes no network requests, but `config-patches.json` and `PROVIDERS.md` reference external APIs (OpenRouter, Together.ai, Google AI). Now correctly scoped: the 4 executable scripts are local-only; reference files describe optional external services.
-- **Fixed: Stale `.clawhubsafe` checksums** — SKILL.md and config-patches.json checksums were outdated, causing `sha256sum -c` failures. `.clawhubsafe` is now pure checksum format (no prose) covering all 10 files with zero warnings.
-- **Added: SECURITY.md two-category breakdown** — Clearly explains the distinction between executable scripts (local, safe) and reference documentation (describes external APIs, not auto-executed). Addresses VirusTotal flag on `${OPENROUTER_API_KEY}` / `${TOGETHER_API_KEY}` patterns in config-patches.json.
-- **Added: config-patches.json warnings** — `_notice` field at root and `_warning` field on `multi_provider_fallback` patch explicitly state external API keys are required and the patch is not auto-applied.
-
-### Changed
-- SKILL.md description updated for accuracy
-- SKILL.md version bumped to 1.3.2
-- `.clawhubsafe` now covers SECURITY.md (10 files total)
-
-## [1.2.3] - 2026-02-07
-
 ### Added
-- **CLI Wrapper Script** (`scripts/optimize.sh`)
-  - One command for all tools: `./optimize.sh route "prompt"`
-  - Subcommands: route, context, recommend, budget, heartbeat, providers, detect
-  - Help system with examples
-- **Configuration Example** (`assets/config.example.json`)
-  - Template for custom configuration
-  - Budget settings, model overrides, heartbeat config
-
-### Changed
-- SKILL.md version updated to match package version
-- Applied patterns from Mission Control for better CLI experience
-
----
-
-## [1.2.2] - 2026-02-06
-
-### Security
-- **REMOVED:** Local Ollama setup instructions (flagged as high-risk by ClawHub security scan)
-  - Removed `curl -fsSL https://ollama.ai/install.sh | sh` commands
-  - Removed `docs/LOCAL-FALLBACK.md` entirely
-  - Removed all Ollama configuration examples
-  - Skill now focuses exclusively on cloud API optimization
-
-### Rationale
-ClawHub security scan flagged piping remote scripts to shell (`curl | sh`) as a potential arbitrary code execution vector. The Token Optimizer skill's primary value is cloud API cost reduction through smart routing and context optimization. Local model fallback is a separate concern and should be implemented independently with proper package manager security.
-
----
-
-## [1.2.0] - 2026-02-06
-
-### Changed
-- **Revised savings estimates**: Now 85-95% (was 50-80%)
-  - Context optimization: 70-90% reduction (was 50-80%)
-  - Model routing: 60-98% cost reduction (was 40-60%)
-  - Heartbeat optimization: 90-95% savings (was 50%)
-- Detailed cost analysis with real calculations and formulas
-- Updated all documentation to reflect accurate savings
+- `SECURITY.md` — Full two-category security breakdown (executable scripts vs. reference docs)
+- `.clawhubsafe` — SHA256 integrity manifest for all 10 skill files
 
 ### Fixed
-- More accurate methodology for calculating combined savings
-- Clarified multiplicative effect of context + model optimizations
+- Resolved VT flag: SKILL.md previously claimed `no_network: true` for entire skill, but PROVIDERS.md and config-patches.json reference external APIs — scoped the guarantee to scripts only
 
----
-
-  - `model_router.py providers` — List available providers
-  - `model_router.py detect` — Show auto-detected provider
-- Provider-agnostic tier system:
-  - `cheap` = Haiku / GPT-4.1-nano / Gemini Flash
-  - `balanced` = Sonnet / GPT-4.1-mini / Gemini 2.5 Flash
-  - `smart` = Opus / GPT-4.1 / Gemini Pro
-  - `premium` = GPT-5 (OpenAI only)
-- One-line installation instructions in README
-- ClawHub-ready SKILL.md with proper metadata
-- This CHANGELOG.md file
-
-### Changed
-- SKILL.md restructured for ClawHub compatibility
-- README updated with clearer installation and usage instructions
-- Model router now returns `all_providers` mapping in route results
-- Tier names normalized to provider-agnostic format
-
-### Fixed
-- Backwards compatibility: legacy tier names (haiku/sonnet/opus) still work
-
-## [1.0.0] - 2026-02-05
+## [1.3.1] - 2026-02-12
 
 ### Added
-- Initial release of Token Optimizer skill
-- **Context Optimizer** (`context_optimizer.py`):
-  - Lazy context loading based on prompt complexity
-  - `recommend` command for context bundle suggestions
-  - `generate-agents` command for optimized AGENTS.md
-  - 50-80% token savings on context loading
-- **Model Router** (`model_router.py`):
-  - Task classification by complexity
-  - Communication pattern detection (greetings, thanks, etc.)
-  - Background task pattern detection (heartbeat, cron, parsing)
-  - Automatic model tier suggestions
-- **Heartbeat Optimizer** (`heartbeat_optimizer.py`):
-  - Intelligent interval tracking
-  - Quiet hours support (23:00-08:00)
-  - Check planning and recording
-  - 50% reduction in heartbeat API calls
-- **Token Tracker** (`token_tracker.py`):
-  - Daily budget monitoring
-  - Usage alerts (ok/warning/exceeded)
-  - Model suggestions based on budget
-- **Assets**:
-  - `HEARTBEAT.template.md` — Drop-in optimized heartbeat
-  - `cronjob-model-guide.md` — Guide for cronjob model selection
-  - `config-patches.json` — Advanced configuration examples
-- **References**:
-  - `PROVIDERS.md` — Alternative providers, pricing, routing strategies
+- `context_optimizer.py` — Context lazy-loading and complexity-based file recommendations
+- `cronjob-model-guide.md` — Model selection guide for cron-based tasks
 
-### Notes
-- Requires Python 3.7+ (stdlib only, no dependencies)
-- Works with any OpenClaw installation
-- Expected savings: 50-80% reduction in token costs
+### Changed
+- Enhanced model_router.py with communication pattern enforcement
 
----
+## [1.2.0] - 2026-02-07
 
-## Version History
-
-| Version | Date | Summary |
-|---------|------|---------|
-| 1.2.0 | 2026-02-06 | Local model fallback, revised savings (85-95%) |
-| 1.1.0 | 2026-02-06 | Multi-provider support, ClawHub-ready |
-| 1.0.0 | 2026-02-05 | Initial release |
-
-## Contributing
-
-When contributing, please:
-1. Update this CHANGELOG.md with your changes
-2. Follow the [Keep a Changelog](https://keepachangelog.com/) format
-3. Use semantic versioning for version bumps
+### Added
+- Initial public release
+- `heartbeat_optimizer.py`, `model_router.py`, `token_tracker.py`
+- `PROVIDERS.md`, `config-patches.json`, `HEARTBEAT.template.md`

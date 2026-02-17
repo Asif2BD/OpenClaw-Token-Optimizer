@@ -2,6 +2,9 @@
 """
 Heartbeat optimizer - Manages efficient heartbeat intervals and batched checks.
 Reduces API calls by tracking check timestamps and batching operations.
+
+v1.4.0: Added cache-ttl alignment — recommends 55min intervals to keep
+Anthropic's 1h prompt cache warm between heartbeats (avoids cache re-write penalty).
 """
 import json
 import os
@@ -9,6 +12,12 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 STATE_FILE = Path.home() / ".openclaw/workspace/memory/heartbeat-state.json"
+
+# Optimal interval to keep Anthropic's 1h prompt cache warm.
+# Set just under 1h so the cache never expires between heartbeats.
+# Anthropic API key users should use this as their default heartbeat interval.
+CACHE_TTL_OPTIMAL_INTERVAL = 3300  # 55 minutes in seconds
+CACHE_TTL_WINDOW = 3600            # Anthropic default cache TTL = 1 hour
 
 DEFAULT_INTERVALS = {
     "email": 3600,      # 1 hour
@@ -144,11 +153,67 @@ def plan_heartbeat(checks=None):
                 "next_check": decision["next_check"]
             })
     
-    return {
+    result = {
         "planned": planned,
         "skipped": skipped,
         "should_run": len(planned) > 0,
         "can_skip": len(planned) == 0
+    }
+
+    # Add cache TTL alignment recommendation
+    result["cache_ttl_tip"] = (
+        "Tip: Set your OpenClaw heartbeat interval to 55min (3300s) "
+        "to keep the Anthropic 1h prompt cache warm. "
+        "Run: heartbeat_optimizer.py cache-ttl for details."
+    )
+
+    return result
+
+def get_cache_ttl_recommendation(cache_ttl_seconds=None):
+    """Calculate optimal heartbeat interval for Anthropic cache TTL warmup.
+    
+    Anthropic prompt caching has a 1h TTL by default on API key profiles.
+    Setting heartbeat interval just under the TTL prevents the cache from
+    expiring between heartbeats — avoiding the cache re-write penalty.
+    
+    Args:
+        cache_ttl_seconds: Your cache TTL in seconds (default: 3600 = 1h)
+    
+    Returns:
+        dict with recommended interval and explanation
+    """
+    if cache_ttl_seconds is None:
+        cache_ttl_seconds = CACHE_TTL_WINDOW
+    
+    # Use 92% of TTL as the safe warmup interval (5min buffer)
+    buffer_seconds = 300  # 5 minute buffer
+    recommended = cache_ttl_seconds - buffer_seconds
+    
+    return {
+        "cache_ttl_seconds": cache_ttl_seconds,
+        "cache_ttl_human": f"{cache_ttl_seconds // 60}min",
+        "recommended_interval_seconds": recommended,
+        "recommended_interval_human": f"{recommended // 60}min",
+        "buffer_seconds": buffer_seconds,
+        "explanation": (
+            f"With a {cache_ttl_seconds // 60}min Anthropic cache TTL, set your heartbeat "
+            f"to {recommended // 60}min ({recommended}s). This keeps the prompt cache warm "
+            f"between heartbeats — preventing the cache re-write penalty when the TTL expires."
+        ),
+        "how_to_configure": (
+            "In openclaw.json: agents.defaults.heartbeat.every = \"55m\"\n"
+            "Or use the config patch from assets/config-patches.json (heartbeat_optimization)"
+        ),
+        "cost_impact": (
+            "Cache writes cost ~3.75x more than cache reads (Anthropic pricing). "
+            "Without warmup: every heartbeat after an idle hour triggers a full cache re-write. "
+            "With warmup: cache reads only — significantly cheaper for long-running agents."
+        ),
+        "note": (
+            "This applies to Anthropic API key users only. "
+            "OAuth profiles use a 1h heartbeat by default (OpenClaw smart default). "
+            "API key profiles default to 30min heartbeat — consider bumping to 55min."
+        )
     }
 
 def update_interval(check_type, new_interval_seconds):
@@ -172,7 +237,7 @@ def main():
     import sys
     
     if len(sys.argv) < 2:
-        print("Usage: heartbeat_optimizer.py [plan|check|record|interval|reset]")
+        print("Usage: heartbeat_optimizer.py [plan|check|record|interval|cache-ttl|reset]")
         sys.exit(1)
     
     command = sys.argv[1]
@@ -212,6 +277,12 @@ def main():
         result = update_interval(check_type, interval)
         print(json.dumps(result, indent=2))
     
+    elif command == "cache-ttl":
+        # Show cache TTL alignment recommendation
+        cache_ttl = int(sys.argv[2]) if len(sys.argv) > 2 else None
+        result = get_cache_ttl_recommendation(cache_ttl)
+        print(json.dumps(result, indent=2))
+    
     elif command == "reset":
         # Reset state
         if STATE_FILE.exists():
@@ -220,6 +291,7 @@ def main():
     
     else:
         print(f"Unknown command: {command}")
+        print("Available: plan | check <type> | record <type> | interval <type> <seconds> | cache-ttl [ttl_seconds] | reset")
         sys.exit(1)
 
 if __name__ == "__main__":
