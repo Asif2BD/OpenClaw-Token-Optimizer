@@ -1,0 +1,5 @@
+# Development artifacts — not part of the published skill
+PR-DESCRIPTION.md
+docs/
+.git/
+.gitignore

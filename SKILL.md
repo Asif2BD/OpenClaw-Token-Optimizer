@@ -1,7 +1,7 @@
 ---
 name: token-optimizer
 description: Reduce OpenClaw token usage and API costs through smart model routing, heartbeat optimization, budget tracking, and native 2026.2.15 features (session pruning, bootstrap size limits, cache TTL alignment). Use when token costs are high, API rate limits are being hit, or hosting multiple agents at scale. The 4 executable scripts (context_optimizer, model_router, heartbeat_optimizer, token_tracker) are local-only — no network requests, no subprocess calls, no system modifications. Reference files (PROVIDERS.md, config-patches.json) document optional multi-provider strategies that require external API keys and network access if you choose to use them. See SECURITY.md for full breakdown.
-version: 1.4.0
+version: 1.4.1
 security:
   verified: true
   auditor: Oracle (Matrix Zion)
