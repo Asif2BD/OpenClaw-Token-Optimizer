@@ -39,6 +39,39 @@ These are informational guides describing optional multi-provider strategies.
 
 These are documentation-level references, not executable network code.
 
+## Shell Wrapper: optimize.sh
+
+`scripts/optimize.sh` is a **convenience CLI wrapper** — it does nothing except call the bundled Python scripts in this same directory. It is not an installer, not a downloader, and makes no network calls.
+
+**What it does (complete source):**
+```bash
+case "$1" in
+    route|model)   python3 "$SCRIPT_DIR/model_router.py" "$@" ;;
+    context)       python3 "$SCRIPT_DIR/context_optimizer.py" generate-agents ;;
+    recommend)     python3 "$SCRIPT_DIR/context_optimizer.py" recommend "$2" ;;
+    budget)        python3 "$SCRIPT_DIR/token_tracker.py" check ;;
+    heartbeat)     cp "$SCRIPT_DIR/../assets/HEARTBEAT.template.md" ~/.openclaw/workspace/HEARTBEAT.md ;;
+esac
+```
+
+**Security properties:**
+- ✅ No network requests
+- ✅ No system modifications
+- ✅ No subprocess spawning beyond the Python scripts already bundled
+- ✅ No eval, exec, or dynamic code execution
+- ✅ Only calls scripts already in this package (same directory via `$SCRIPT_DIR`)
+- ✅ Included in `.clawhubsafe` SHA256 manifest
+
+**To verify before running:**
+```bash
+grep -E "curl|wget|nc |ncat|ssh|sudo|chmod|eval|exec\(" scripts/optimize.sh
+# Should return nothing
+```
+
+**If you prefer not to use the shell wrapper:** use the Python scripts directly (all documented in SKILL.md). The wrapper is optional.
+
+---
+
 ## Script-by-Script Security Analysis
 
 ### 1. context_optimizer.py
@@ -226,6 +259,25 @@ No third-party libraries. No network libraries.
 - No privileged operations
 - No external dependencies
 - Auditable source code
+
+## Provenance & Source
+
+This skill is maintained by **Asif2BD** (M Asif Rahman). All source code is publicly auditable:
+
+- **GitHub repository:** https://github.com/Asif2BD/OpenClaw-Token-Optimizer
+- **ClawHub listing:** https://clawhub.ai/Asif2BD/openclaw-token-optimizer
+- **Author:** Asif2BD
+- **License:** Apache 2.0
+
+Every file in this skill bundle is listed in `.clawhubsafe` with its SHA256 checksum. Verify integrity at any time:
+```bash
+cd ~/.openclaw/skills/openclaw-token-optimizer
+sha256sum -c .clawhubsafe
+```
+
+The README references the GitHub repo for users who want to review the source before installing. That link is informational — nothing in the skill auto-downloads from it.
+
+---
 
 ## License & Attribution
 
