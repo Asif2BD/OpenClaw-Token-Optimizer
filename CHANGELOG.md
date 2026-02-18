@@ -2,6 +2,20 @@
 
 All notable changes to OpenClaw Token Optimizer are documented here.
 
+## [1.4.2] - 2026-02-18
+
+### Fixed
+- **ClawHub security scanner: `Source: unknown` / `homepage: none`** — Added `homepage`, `source`, and `author` fields to SKILL.md frontmatter. Provenance is now fully declared in the registry.
+- **`optimize.sh` missing from integrity manifest** — Added `scripts/optimize.sh` to `.clawhubsafe`. The manifest now covers 13 files (previously 12). Every bundled file is SHA256-verified.
+- **`optimize.sh` undocumented** — New dedicated section in `SECURITY.md` with full source disclosure: what the wrapper does (delegates to bundled Python scripts only), security properties, and a one-line audit command for users who want to verify before running.
+- **Provenance undocumented** — New `Provenance & Source` section in `SECURITY.md` with explicit GitHub repo + ClawHub listing links and integrity verification instructions.
+
+## [1.4.1] - 2026-02-18
+
+### Fixed
+- **ClawHub public visibility blocked** — `PR-DESCRIPTION.md` (a leftover dev file containing `git push` / `gh pr create` shell commands) was included in the v1.4.0 bundle, triggering ClawHub's security scanner hold.
+- **Added `.clawhubignore`** — Now excludes `PR-DESCRIPTION.md`, `docs/`, `.git/`, `.gitignore` from all future publishes. Only skill-relevant files are bundled.
+
 ## [1.4.0] - 2026-02-17
 
 ### Added
