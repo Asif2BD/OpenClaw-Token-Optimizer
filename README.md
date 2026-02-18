@@ -1,400 +1,192 @@
-# 🪙 Token Optimizer
+# OpenClaw Token Optimizer
 
-**Reduce OpenClaw token usage and API costs by 85-95%**
+**Reduce OpenClaw token usage and API costs by 50-80%**
 
-An OpenClaw skill that implements smart model routing, lazy context loading, optimized heartbeats, and multi-provider support for maximum cost savings.
+An OpenClaw skill for smart model routing, lazy context loading, optimized heartbeats, budget tracking, and native OpenClaw 2026.2.15 features (session pruning, bootstrap size limits, cache TTL alignment).
 
-[![ClawHub](https://img.shields.io/badge/ClawHub-Ready-blue)](https://clawhub.ai)
-[![Version](https://img.shields.io/badge/version-1.2.3-green)](https://github.com/Asif2BD/OpenClaw-Token-Optimizer/blob/main/CHANGELOG.md)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![ClawHub](https://img.shields.io/badge/ClawHub-openclaw--token--optimizer-blue)](https://clawhub.ai/Asif2BD/openclaw-token-optimizer)
+[![Version](https://img.shields.io/badge/version-1.4.2-green)](https://github.com/Asif2BD/OpenClaw-Token-Optimizer/blob/main/CHANGELOG.md)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-yellow.svg)](https://opensource.org/licenses/Apache-2.0)
 [![OpenClaw](https://img.shields.io/badge/OpenClaw-Skill-purple)](https://openclaw.ai)
 
 ---
 
-## 🚀 One-Line Installation
+## 🚀 Installation
 
+### Option 1: ClawHub (recommended)
 ```bash
-git clone https://github.com/Asif2BD/OpenClaw-Token-Optimizer.git ~/.openclaw/skills/token-optimizer
+clawhub install Asif2BD/openclaw-token-optimizer
 ```
 
-**Done!** Your agent now has access to token optimization tools.
+Or browse to: [clawhub.ai/Asif2BD/openclaw-token-optimizer](https://clawhub.ai/Asif2BD/openclaw-token-optimizer)
 
-### Alternative: Tell Your Agent
-
-> "Install the token-optimizer skill from github.com/Asif2BD/OpenClaw-Token-Optimizer"
-
-Your agent will clone it to the skills directory automatically.
-
----
-
-## 🛠️ CLI Wrapper (Easy Mode)
-
-Use the unified CLI wrapper for quick access to all tools:
-
+### Option 2: Manual (GitHub)
 ```bash
-cd ~/.openclaw/skills/token-optimizer/scripts
-
-# Route a prompt to appropriate model
-./optimize.sh route "thanks!"           # → cheap tier (Haiku)
-./optimize.sh route "design an API"     # → smart tier (Opus)
-
-# Generate optimized AGENTS.md
-./optimize.sh context
-
-# Check token budget
-./optimize.sh budget
-
-# Install optimized heartbeat
-./optimize.sh heartbeat
-
-# See all commands
-./optimize.sh help
+git clone https://github.com/Asif2BD/OpenClaw-Token-Optimizer.git \
+  ~/.openclaw/skills/openclaw-token-optimizer
 ```
-
----
-
-## 🎯 Quick Start
-
-### 1. Generate Optimized AGENTS.md (Biggest Win!)
-
-```bash
-python3 ~/.openclaw/skills/token-optimizer/scripts/context_optimizer.py generate-agents
-# Creates AGENTS.md.optimized — review and replace your current AGENTS.md
-```
-
-This teaches your agent to load only the context it needs (70-90% context reduction!).
-
-### 2. Route Tasks to Appropriate Models
-
-```bash
-# Check what model to use for a prompt
-python3 ~/.openclaw/skills/token-optimizer/scripts/model_router.py "thanks!"
-# → Output: Use cheap tier (Haiku/Nano/Flash), not Opus!
-
-python3 ~/.openclaw/skills/token-optimizer/scripts/model_router.py "design a microservices architecture"
-# → Output: Use smart tier (Opus/GPT-4.1/Pro)
-```
-
-### 3. Install Optimized Heartbeat
-
-```bash
-cp ~/.openclaw/skills/token-optimizer/assets/HEARTBEAT.template.md ~/.openclaw/workspace/HEARTBEAT.md
-```
-
-### 4. Check Token Budget
-
-```bash
-python3 ~/.openclaw/skills/token-optimizer/scripts/token_tracker.py check
-```
-
-**Expected savings:** 85-95% reduction in token costs for typical workloads.
-
----
-
-## 📦 What's Included
-
-### Scripts
-
-| Script | Purpose | Savings |
-|--------|---------|---------|
-| `context_optimizer.py` | Lazy context loading — only load needed files | 70-90% |
-| `model_router.py` | Smart model selection with multi-provider support | 60-98% |
-| `heartbeat_optimizer.py` | Efficient heartbeat scheduling | 90-95% |
-| `token_tracker.py` | Budget monitoring and alerts | Prevents overruns |
-
-
-### Assets
-
-| File | Purpose |
-|------|---------|
-| `HEARTBEAT.template.md` | Drop-in optimized heartbeat template |
-| `cronjob-model-guide.md` | Guide for choosing models in cronjobs |
-| `config-patches.json` | Advanced configuration examples |
-
-### References
-
-| File | Purpose |
-|------|---------|
-| `PROVIDERS.md` | Alternative AI providers, pricing, routing strategies |
-
----
-
-## 🌐 Multi-Provider Support
-
-The skill supports multiple AI providers with automatic detection:
-
-| Provider | Cheap Tier | Balanced Tier | Smart Tier |
-|----------|------------|---------------|------------|
-| **Anthropic** | claude-haiku-4 | claude-sonnet-4-5 | claude-opus-4 |
-| **OpenAI** | gpt-4.1-nano | gpt-4.1-mini | gpt-4.1 |
-| **Google** | gemini-2.0-flash | gemini-2.5-flash | gemini-2.5-pro |
-| **OpenRouter** | gemini-2.0-flash | claude-sonnet-4-5 | claude-opus-4 |
-
-Set your preferred provider via environment variable:
-
-```bash
-export ANTHROPIC_API_KEY="sk-ant-..."   # Default
-export OPENAI_API_KEY="sk-proj-..."     # For OpenAI routing
-export GOOGLE_API_KEY="AIza..."         # For Google routing
-export OPENROUTER_API_KEY="sk-or-..."   # For unified API
-```
-
-The model router auto-detects which provider to use based on available keys.
-
-```bash
-# Compare models across all providers
-python3 scripts/model_router.py compare
-
-# Force specific provider
-python3 scripts/model_router.py "thanks" --provider openai
-```
-
----
-
-## 💡 Core Optimization Strategies
-
-### 1. Context Optimization (Biggest Win!)
-
-**Problem:** Default OpenClaw loads ALL context files — often 50K+ tokens before the user speaks.
-
-**Solution:** Load only what's needed based on prompt complexity.
-
-```bash
-# Simple greeting → minimal context (2 files only!)
-python3 scripts/context_optimizer.py recommend "hi"
-# → Load: SOUL.md, IDENTITY.md (savings: ~80%)
-
-# Complex task → full context
-python3 scripts/context_optimizer.py recommend "analyze architecture"
-# → Load: SOUL.md, IDENTITY.md, MEMORY.md, etc. (savings: ~30%)
-```
-
-### 2. Smart Model Routing
-
-**Problem:** Using Opus ($15/MTok) for "thanks!" is wasteful.
-
-**Solution:** Route to appropriate tier based on task.
-
-```bash
-# Communication → ALWAYS cheap tier
-python3 scripts/model_router.py "thanks!"
-# → anthropic/claude-haiku-4 (or openai/gpt-4.1-nano)
-
-# Complex task → smart tier (only when needed)
-python3 scripts/model_router.py "design a microservices architecture"
-# → anthropic/claude-opus-4
-```
-
-### 3. Heartbeat Optimization
-
-**Problem:** Checking email every 5 minutes at 3 AM wastes tokens.
-
-**Solution:** Smart intervals + quiet hours.
-
-```bash
-python3 scripts/heartbeat_optimizer.py plan
-# → Checks what needs checking, skips during quiet hours
-```
-
----
-
-## 📊 Cost Savings Analysis (v1.2.0 Revised)
-
-### Why 85-95% Savings?
-
-Our initial estimates (50-80%) were conservative. Here's the realistic breakdown:
-
-#### 1. Lazy Context Loading (70-90% context reduction)
-
-| Task Type | % of Traffic | Context Loaded | Reduction |
-|-----------|--------------|----------------|-----------|
-| Simple chat/greetings | 60-70% | SOUL.md + IDENTITY.md only | **90%** |
-| Standard work | 20-30% | + Today's memory | **70%** |
-| Complex tasks | 10% | Full context | **30%** |
-
-**Weighted average:** 60% × 90% + 30% × 70% + 10% × 30% = **78% context reduction**
-
-#### 2. Model Routing (60-98% cost per token)
-
-| Task Type | Cloud Model | Local/Cheap Model | Savings |
-|-----------|-------------|-------------------|---------|
-| Simple chat | Sonnet ($3/M) | Haiku ($0.25/M) | **92%** |
-| Greetings | Sonnet ($3/M) | Haiku ($0.25/M) | **92%** |
-| Complex | Sonnet ($3/M) | Sonnet ($3/M) | 0% |
-
-**Weighted average:** 70% × 92% + 30% × 0% = **64% model cost reduction**
-
-#### 3. Combined Effect (Multiplicative!)
-
-```
-Total Savings = 1 - (Context Remaining × Model Cost Remaining)
-             = 1 - (0.22 × 0.36)
-             = 1 - 0.08
-             = 92% savings
-```
-
-#### 4. Heartbeat Optimization (90-95% savings)
-
-| Optimization | Reduction |
-|--------------|-----------|
-| Quiet hours (8h/day) | 33% fewer calls |
-| Haiku instead of Sonnet | 92% cheaper per call |
-| Batching/skip redundant | 20% fewer calls |
-| **Combined** | **~95% heartbeat savings** |
-
-### Monthly Cost Examples
-
-| Scenario | Before | After | Savings |
-|----------|--------|-------|---------|
-| Light usage (50K tokens/day) | $4.50/mo | $0.45/mo | **90%** |
-| Medium usage (200K tokens/day) | $18.00/mo | $1.80/mo | **90%** |
-| Heavy usage (1M tokens/day) | $90.00/mo | $9.00/mo | **90%** |
-| + Local fallback when offline | Any | $0.00 | **100%** |
-
-### Cronjob Savings
-
-Using Haiku instead of Opus for 10 daily cronjobs:
-- **Before:** 10 × 5K tokens × $15/MTok = $0.75/day = **$22.50/month**
-- **After:** 10 × 5K tokens × $0.25/MTok = $0.0125/day = **$0.38/month**
-- **Savings: $22/month per agent** (98% reduction)
-
----
-
-## 🛸 Local Model Fallback (Emergency Fuel Mode)
-
-**NEW in v1.2.0!** When cloud APIs fail, your agent keeps running on local models.
-
-### Quick Setup
-
-```bash
-```
-
-### Configure OpenClaw
-
-Add to `~/.openclaw/config.json`:
-
+Then add to `openclaw.json`:
 ```json
 {
-  "models": {
-    "providers": {
-      }
-    }
-  },
-  "agents": {
-    "defaults": {
-      "model": {
-      }
+  "skills": {
+    "load": {
+      "extraDirs": ["~/.openclaw/skills/openclaw-token-optimizer"]
     }
   }
 }
 ```
 
-### Benefits
-
-| Benefit | Description |
-|---------|-------------|
-| 💰 Zero cost | No API charges when on local |
-| 🚫 No rate limits | Process unlimited requests |
-| 📡 Works offline | No internet required |
-| 🔒 Privacy | Data never leaves your machine |
-
+### One-line install prompt for your agent
+> "Install the OpenClaw Token Optimizer skill from https://clawhub.ai/Asif2BD/openclaw-token-optimizer — or if ClawHub isn't available, clone https://github.com/Asif2BD/OpenClaw-Token-Optimizer and add the path to skills.load.extraDirs in openclaw.json"
 
 ---
 
-## 📋 Changelog
+## ✨ What's New in v1.4.x (OpenClaw 2026.2.15)
+
+Three **native config patches** that work today with zero external dependencies:
+
+### Session Pruning
+Auto-trim old tool results when the Anthropic cache TTL expires — reduces cache re-write costs.
+```json
+{ "agents": { "defaults": { "contextPruning": { "mode": "cache-ttl", "ttl": "5m" } } } }
+```
+
+### Bootstrap Size Limits
+Cap workspace file injection into the system prompt (20-40% reduction for large workspaces).
+```json
+{ "agents": { "defaults": { "bootstrapMaxChars": 10000, "bootstrapTotalMaxChars": 15000 } } }
+```
+
+### Cache Retention for Opus
+Amortize cache write costs on long Opus sessions.
+```json
+{ "agents": { "defaults": { "models": { "anthropic/claude-opus-4-5": { "params": { "cacheRetention": "long" } } } } } }
+```
+
+### Cache TTL Heartbeat Alignment
+Keep the Anthropic 1h prompt cache warm — avoid the re-write penalty.
+```bash
+python3 scripts/heartbeat_optimizer.py cache-ttl
+# → recommended_interval: 55min (3300s)
+```
+
+---
+
+## 🛠️ Quick Start
+
+**1. Context optimization (biggest win):**
+```bash
+python3 scripts/context_optimizer.py recommend "hi, how are you?"
+# → Load only 2 files, skip everything else → ~80% savings
+```
+
+**2. Model routing:**
+```bash
+python3 scripts/model_router.py "design a microservices architecture"
+# → Complex task → Opus
+python3 scripts/model_router.py "thanks!"
+# → Simple ack → Sonnet (cheapest available)
+```
+
+**3. Optimized heartbeat:**
+```bash
+cp assets/HEARTBEAT.template.md ~/.openclaw/workspace/HEARTBEAT.md
+python3 scripts/heartbeat_optimizer.py plan
+```
+
+**4. Token budget check:**
+```bash
+python3 scripts/token_tracker.py check
+```
+
+**5. Cache TTL alignment:**
+```bash
+python3 scripts/heartbeat_optimizer.py cache-ttl
+# Set heartbeat to 55min to keep Anthropic 1h cache warm
+```
+
+---
+
+## 🔍 Native OpenClaw Diagnostics (2026.2.15+)
+
+```
+/context list    → per-file token breakdown (use before applying bootstrap limits)
+/context detail  → full system prompt breakdown
+/usage tokens    → append token count to every reply
+/usage cost      → cumulative cost summary
+```
+
+---
+
+## 📁 Skill Structure
+
+```
+openclaw-token-optimizer/
+├── SKILL.md                    ← Skill definition (loaded by OpenClaw)
+├── SECURITY.md                 ← Full security audit + provenance
+├── CHANGELOG.md                ← Version history
+├── .clawhubsafe                ← SHA256 integrity manifest (13 files)
+├── .clawhubignore              ← Files excluded from publish bundle
+├── scripts/
+│   ├── context_optimizer.py    ← Context lazy-loading
+│   ├── model_router.py         ← Task classification + model routing
+│   ├── heartbeat_optimizer.py  ← Interval management + cache-ttl alignment
+│   ├── token_tracker.py        ← Budget monitoring
+│   └── optimize.sh             ← Convenience CLI wrapper (calls Python scripts)
+├── assets/
+│   ├── config-patches.json     ← Ready-to-apply config patches
+│   ├── HEARTBEAT.template.md   ← Drop-in optimized heartbeat template
+│   └── cronjob-model-guide.md  ← Model selection for cron tasks
+└── references/
+    └── PROVIDERS.md            ← Multi-provider strategy guide
+```
+
+---
+
+## 📊 Expected Savings
+
+| Strategy | Context | Model | Monthly (100K tok/day) | Savings |
+|---|---|---|---|---|
+| Baseline (no optimization) | 50K | Sonnet | $9.00 | 0% |
+| Context optimization only | 10K | Sonnet | $5.40 | 40% |
+| Model routing only | 50K | Mixed | $5.40 | 40% |
+| **Both (this skill)** | **10K** | **Mixed** | **$2.70** | **70%** |
+
+---
+
+## 🔒 Security
+
+All scripts are **local-only** — no network calls, no subprocess spawning, no system modifications. See [SECURITY.md](SECURITY.md) for full per-script audit.
+
+Verify integrity:
+```bash
+cd ~/.openclaw/skills/openclaw-token-optimizer
+sha256sum -c .clawhubsafe
+```
+
+Quick audit (should return nothing):
+```bash
+grep -r "urllib\|requests\|socket\|subprocess\|curl\|wget" scripts/
+```
+
+---
+
+## 📜 Changelog
 
 See [CHANGELOG.md](CHANGELOG.md) for full version history.
 
-### v1.2.0 (2026-02-06)
-- 🛸 **Local model fallback** (Emergency Fuel Mode) with Ollama integration
-- 📊 **Revised savings estimates** — now 85-95% (was 50-80%)
-- 📝 Detailed cost analysis with real calculations
-
-### v1.1.0 (2026-02-06)
-- ✨ **Multi-provider support**: OpenAI, Google, OpenRouter
-- 🏷️ Provider-agnostic tier system (cheap/balanced/smart)
-- 📦 ClawHub-ready SKILL.md with proper metadata
-- 📝 One-line installation instructions
-
-### v1.0.0 (2026-02-05)
-- 🎉 Initial release
-- Context optimizer, model router, heartbeat optimizer, token tracker
-- Comprehensive documentation and examples
+**v1.4.2** — Security scanner fixes (provenance, optimize.sh manifest, SECURITY.md)  
+**v1.4.1** — `.clawhubignore` added (fixes public visibility)  
+**v1.4.0** — Native OpenClaw 2026.2.15 features (session pruning, bootstrap limits, cache TTL)  
+**v1.3.3** — Correct display name on ClawHub  
+**v1.3.2** — Security audit, SECURITY.md, .clawhubsafe manifest  
 
 ---
 
-## 🔧 Requirements
+## 🔗 Links
 
-- Python 3.7+ (stdlib only, no external dependencies)
-- OpenClaw installation
-- Write access to `~/.openclaw/workspace/memory/`
-
----
-
-## 📁 Project Structure
-
-```
-token-optimizer/
-├── SKILL.md              # Skill definition (ClawHub-ready)
-├── README.md             # This file
-├── CHANGELOG.md          # Version history
-├── LICENSE               # MIT License
-├── scripts/
-│   ├── context_optimizer.py   # Context loading optimization
-│   ├── model_router.py        # Multi-provider model routing
-│   ├── heartbeat_optimizer.py # Heartbeat interval management
-│   └── token_tracker.py       # Budget monitoring
-├── assets/
-│   ├── HEARTBEAT.template.md  # Drop-in heartbeat template
-│   ├── cronjob-model-guide.md # Cronjob model selection guide
-│   └── config-patches.json    # Advanced config examples
-├── docs/
-│   └── RESEARCH-NOTES.md      # Research and methodology
-└── references/
-    └── PROVIDERS.md           # Provider comparison guide
-```
-
----
-
-## 📖 Full Documentation
-
-See [SKILL.md](SKILL.md) for complete documentation including:
-- All script options and examples
-- Integration patterns
-- Workflow examples
-- Troubleshooting guide
-
----
-
-## 🤝 Contributing
-
-Contributions welcome! Please open an issue or PR.
-
-**Ideas for extending this skill:**
-1. Auto-routing integration with OpenClaw message pipeline
-2. Real-time usage tracking via session_status parsing
-3. Cost forecasting based on recent usage
-4. Provider health monitoring
-5. A/B testing for routing strategies
-6. Automatic local model selection based on task type
-7. Hybrid mode: local for simple, cloud for complex
-
----
-
-## 📄 License
-
-MIT License — see [LICENSE](LICENSE) for details.
-
----
-
-## 🙏 Credits
-
-Part of the **SuperSkills** collection for OpenClaw.
-
-Created by:
-- **Oracle** — Research, analysis, and documentation
-- **Morpheus** — Code review and publication
-
----
-
-*"The best token is the one you don't spend."* 🪙
+- **ClawHub:** https://clawhub.ai/Asif2BD/openclaw-token-optimizer
+- **GitHub:** https://github.com/Asif2BD/OpenClaw-Token-Optimizer
+- **OpenClaw Docs:** https://docs.openclaw.ai
+- **License:** Apache 2.0
+- **Author:** [Asif2BD](https://github.com/Asif2BD)
