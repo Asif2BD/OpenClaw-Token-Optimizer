@@ -2,6 +2,11 @@
 
 All notable changes to OpenClaw Token Optimizer are documented here.
 
+## [1.4.3] - 2026-02-18
+
+### Fixed
+- README completely rewritten: correct name ("OpenClaw Token Optimizer"), version badge (1.4.3), install command (clawhub install Asif2BD/openclaw-token-optimizer), license (Apache 2.0), all skill paths corrected to openclaw-token-optimizer, v1.4.x features documented.
+
 ## [1.4.2] - 2026-02-18
 
 ### Fixed
