@@ -1,7 +1,7 @@
 ---
 name: token-optimizer
 description: Reduce OpenClaw token usage and API costs through smart model routing, heartbeat optimization, budget tracking, and native 2026.2.15 features (session pruning, bootstrap size limits, cache TTL alignment). Use when token costs are high, API rate limits are being hit, or hosting multiple agents at scale. The 4 executable scripts (context_optimizer, model_router, heartbeat_optimizer, token_tracker) are local-only — no network requests, no subprocess calls, no system modifications. Reference files (PROVIDERS.md, config-patches.json) document optional multi-provider strategies that require external API keys and network access if you choose to use them. See SECURITY.md for full breakdown.
-version: 1.4.3
+version: 3.0.0
 homepage: https://github.com/Asif2BD/OpenClaw-Token-Optimizer
 source: https://github.com/Asif2BD/OpenClaw-Token-Optimizer
 author: Asif2BD
@@ -56,6 +56,105 @@ Comprehensive toolkit for reducing token usage and API costs in OpenClaw deploym
    ```
 
 **Expected savings:** 50-80% reduction in token costs for typical workloads (context optimization is the biggest factor!).
+
+
+## Strategy #0: Lazy Skill Loading (NEW in v3.0 — Biggest Win)
+
+**The single highest-impact optimization available.** Most agents load all context upfront — MEMORY.md, all docs, all skills — every session. This is the #1 cause of wasted tokens.
+
+Lazy loading means: **load nothing by default, load on demand.**
+
+### The Problem
+
+A typical agent session without lazy loading:
+
+```
+System prompt: SOUL.md (3K) + IDENTITY.md (1K) + MEMORY.md (12K) + AGENTS.md (8K)
+             + all skill docs (20K+) + USER.md (2K) + TOOLS.md (3K)
+Total: ~49K tokens — every single message, whether it's "hi" or a complex task
+```
+
+### The Solution: Skill Catalog + On-Demand Loading
+
+**Step 1 — Create a `SKILLS.md` catalog** (index only, no full docs):
+
+```markdown
+# Skills Catalog
+
+## productivity/mission-control
+Path: skills/mission-control/SKILL.md
+When to load: User asks about tasks, projects, Mission Control, JARVIS
+
+## content/marketing-mode
+Path: skills/marketing-mode/SKILL.md
+When to load: User asks for copywriting, social posts, marketing content
+
+## dev/code-review
+Path: skills/code-review/SKILL.md
+When to load: User asks for code review, PR feedback, bug analysis
+```
+
+**Step 2 — Update your `AGENTS.md`** to load skills lazily:
+
+```markdown
+## Skills (Lazy Loading)
+
+Do NOT pre-read skill documentation.
+
+When a skill might help:
+1. Read SKILLS.md catalog
+2. Find the matching skill name and SKILL.md path
+3. Read only that SKILL.md
+
+This saves ~60K tokens per session. Only read SKILLS.md when you
+genuinely need a skill — do not read it on every message.
+```
+
+**Step 3 — Apply the same rule to all context files:**
+
+```markdown
+## Context Loading Strategy
+
+Default: load SOUL.md + IDENTITY.md only.
+
+Load on-demand:
+- MEMORY.md → only when user mentions memory/history/past
+- USER.md → only when user asks about themselves
+- TOOLS.md → only when user asks about tools/devices
+- docs/**/* → only when explicitly referenced
+- memory/YYYY-MM-DD.md → only today's log, only when needed
+```
+
+### Token Savings
+
+| Session Type | Before | After | Savings |
+|---|---|---|---|
+| Simple chat ("hi", "thanks") | ~49K tokens | ~4K tokens | **92%** |
+| Standard task (code, write) | ~49K tokens | ~12K tokens | **75%** |
+| Complex task (with memory) | ~49K tokens | ~25K tokens | **49%** |
+
+### Using context_optimizer.py
+
+```bash
+# Get loading recommendation for a specific prompt
+python3 scripts/context_optimizer.py recommend "write me a blog post"
+# → Recommends: SOUL.md, IDENTITY.md, skills/marketing-mode/SKILL.md
+
+# Generate an optimized AGENTS.md with lazy loading built in
+python3 scripts/context_optimizer.py generate-agents
+
+# Find which skill matches a task
+python3 scripts/context_optimizer.py find-skill "I need to review a PR"
+# → Matches: dev/code-review
+```
+
+### Rules to Enforce
+
+1. **Never load a skill doc before checking if the task needs it**
+2. **Load `SKILLS.md` first, then only the matching `SKILL.md`**
+3. **Simple conversations (greetings, acks, yes/no) load zero extra context**
+4. **Re-read files only if they've changed since last load**
+5. **MEMORY.md is not a startup file — load only when memory is needed**
 
 ## Core Capabilities
 
