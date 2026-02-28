@@ -1,7 +1,7 @@
 ---
 name: token-optimizer
 description: Reduce OpenClaw token usage and API costs through smart model routing, heartbeat optimization, budget tracking, and native 2026.2.15 features (session pruning, bootstrap size limits, cache TTL alignment). Use when token costs are high, API rate limits are being hit, or hosting multiple agents at scale. The 4 executable scripts (context_optimizer, model_router, heartbeat_optimizer, token_tracker) are local-only — no network requests, no subprocess calls, no system modifications. Reference files (PROVIDERS.md, config-patches.json) document optional multi-provider strategies that require external API keys and network access if you choose to use them. See SECURITY.md for full breakdown.
-version: 1.4.3
+version: 3.0.0
 homepage: https://github.com/Asif2BD/OpenClaw-Token-Optimizer
 source: https://github.com/Asif2BD/OpenClaw-Token-Optimizer
 author: Asif2BD
@@ -58,6 +58,46 @@ Comprehensive toolkit for reducing token usage and API costs in OpenClaw deploym
 **Expected savings:** 50-80% reduction in token costs for typical workloads (context optimization is the biggest factor!).
 
 ## Core Capabilities
+
+### 0. Lazy Skill Loading (NEW in v3.0 — BIGGEST WIN!)
+
+**The single highest-impact optimization available.** Most agents burn 3,000–15,000 tokens per session loading skill files they never use. Stop that first.
+
+**The pattern:**
+
+1. Create a lightweight `SKILLS.md` catalog in your workspace (~300 tokens — list of skills + when to load them)
+2. Only load individual SKILL.md files when a task actually needs them
+3. Apply the same logic to memory files — load MEMORY.md at startup, daily logs only on demand
+
+**Token savings:**
+
+| Library size | Before (eager) | After (lazy) | Savings |
+|---|---|---|---|
+| 5 skills | ~3,000 tokens | ~600 tokens | **80%** |
+| 10 skills | ~6,500 tokens | ~750 tokens | **88%** |
+| 20 skills | ~13,000 tokens | ~900 tokens | **93%** |
+
+**Quick implementation in AGENTS.md:**
+
+```markdown
+## Skills
+
+At session start: Read SKILLS.md (the index only — ~300 tokens).
+Load individual skill files ONLY when a task requires them.
+Never load all skills upfront.
+```
+
+**Full implementation (with catalog template + optimizer script):**
+
+```bash
+clawhub install openclaw-skill-lazy-loader
+```
+
+The companion skill `openclaw-skill-lazy-loader` includes a `SKILLS.md.template`, an `AGENTS.md.template` lazy-loading section, and a `context_optimizer.py` CLI that recommends exactly which skills to load for any given task.
+
+**Lazy loading handles context loading costs. The remaining capabilities below handle runtime costs.** Together they cover the full token lifecycle.
+
+---
 
 ### 1. Context Optimization (NEW!)
 

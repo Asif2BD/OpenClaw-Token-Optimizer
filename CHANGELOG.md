@@ -2,6 +2,17 @@
 
 All notable changes to OpenClaw Token Optimizer are documented here.
 
+## [3.0.0] - 2026-02-28
+
+### Added
+- **Lazy Skill Loading section** (Capability 0) — The highest-impact optimization: use a lightweight SKILLS.md catalog at startup and load individual skill files only when tasks require them. Reduces context loading costs 40–93% depending on library size.
+- References companion skill `openclaw-skill-lazy-loader` (`clawhub install openclaw-skill-lazy-loader`) which provides SKILLS.md.template, AGENTS.md.template lazy-loading section, and context_optimizer.py CLI.
+- Token savings table for lazy loading (5/10/20 skills: 80%/88%/93% reduction).
+
+### Changed
+- Version bumped to 3.0.0 reflecting the major expansion of optimization coverage to include pre-runtime context loading phase.
+- Lazy loading is now positioned as "Capability 0" — the first optimization to apply before all others.
+
 ## [1.4.3] - 2026-02-18
 
 ### Fixed
