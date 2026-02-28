@@ -1,5 +1,21 @@
 # Changelog
 
+## [3.0.0] - 2026-02-28
+
+### Added
+- **Strategy #0: Lazy Skill Loading** — New highest-impact optimization. Load SOUL.md + IDENTITY.md only by default; all skills, memory, and docs load on-demand. Documented with step-by-step SKILLS.md catalog pattern and AGENTS.md template. Expected savings: 75-92% per session depending on task type.
+- **`context_optimizer.py find-skill`** — New command to match a user prompt to the correct skill SKILL.md path.
+- **Session type savings table** — Before/after token counts for simple chat, standard task, and complex task sessions.
+- **Lazy loading rules checklist** — 5 enforceable rules to prevent context drift back to eager loading.
+
+### Changed
+- Version bumped from 1.4.3 → 3.0.0 (major version: lazy loading is a paradigm shift, not an incremental improvement)
+- SKILL.md restructured: lazy loading appears first as Strategy #0, before all other strategies
+
+---
+
+
+
 All notable changes to OpenClaw Token Optimizer are documented here.
 
 ## [1.4.3] - 2026-02-18
