@@ -92,9 +92,8 @@ def suggest_cheaper_model(current_model, task_type="general"):
     """
     # Cost per 1M tokens (input/output average)
     model_costs = {
-        "anthropic/claude-opus-4": 15.0,
+        "anthropic/claude-opus-4-5": 15.0,
         "anthropic/claude-sonnet-4-5": 3.0,
-        "anthropic/claude-haiku-4": 0.25,
         "google/gemini-2.0-flash-exp": 0.075,
         "openai/gpt-4o": 2.5,
         "openai/gpt-4o-mini": 0.15
@@ -102,7 +101,7 @@ def suggest_cheaper_model(current_model, task_type="general"):
     
     suggestions = {
         "simple": [
-            ("anthropic/claude-haiku-4", "12x cheaper, great for file reads, routine checks"),
+            ("anthropic/claude-sonnet-4-5", "Default OpenClaw model; keep simple tasks brief and avoid Opus"),
             ("google/gemini-2.0-flash-exp", "40x cheaper via OpenRouter, good for simple tasks")
         ],
         "general": [
@@ -110,7 +109,7 @@ def suggest_cheaper_model(current_model, task_type="general"):
             ("google/gemini-2.0-flash-exp", "Much cheaper, decent quality")
         ],
         "complex": [
-            ("anthropic/claude-opus-4", "Best reasoning, use sparingly"),
+            ("anthropic/claude-opus-4-5", "Best reasoning, use sparingly"),
             ("anthropic/claude-sonnet-4-5", "Good balance for most complex tasks")
         ]
     }

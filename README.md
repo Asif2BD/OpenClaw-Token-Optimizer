@@ -2,10 +2,10 @@
 
 **Reduce OpenClaw token usage and API costs by 50-80%**
 
-An OpenClaw skill for smart model routing, lazy context loading, optimized heartbeats, budget tracking, and native OpenClaw 2026.2.15 features (session pruning, bootstrap size limits, cache TTL alignment).
+An OpenClaw skill for smart model routing, lazy context loading, optimized heartbeats, budget tracking, and native OpenClaw 2026.6.x features (session pruning, bootstrap size limits, cache TTL alignment).
 
 [![ClawHub](https://img.shields.io/badge/ClawHub-openclaw--token--optimizer-blue)](https://clawhub.ai/Asif2BD/openclaw-token-optimizer)
-[![Version](https://img.shields.io/badge/version-1.4.2-green)](https://github.com/Asif2BD/OpenClaw-Token-Optimizer/blob/main/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.1.0-green)](https://github.com/Asif2BD/OpenClaw-Token-Optimizer/blob/main/CHANGELOG.md)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-yellow.svg)](https://opensource.org/licenses/Apache-2.0)
 [![OpenClaw](https://img.shields.io/badge/OpenClaw-Skill-purple)](https://openclaw.ai)
 
@@ -41,7 +41,15 @@ Then add to `openclaw.json`:
 
 ---
 
-## ✨ What's New in v1.4.x (OpenClaw 2026.2.15)
+## What's New in v3.1.0 (OpenClaw 2026.6.x)
+
+Security-audit fixes:
+- `generate-agents` prints to stdout by default; file writes require `--output`.
+- `optimize.sh heartbeat` previews by default; `heartbeat install` writes with backup protection.
+- Documentation now says which commands write local workspace state.
+- Model routing defaults to Sonnet/Opus for current OpenClaw installs.
+
+## Native OpenClaw Features
 
 Three **native config patches** that work today with zero external dependencies:
 
@@ -90,7 +98,9 @@ python3 scripts/model_router.py "thanks!"
 
 **3. Optimized heartbeat:**
 ```bash
-cp assets/HEARTBEAT.template.md ~/.openclaw/workspace/HEARTBEAT.md
+./scripts/optimize.sh heartbeat
+# To install with backup protection:
+./scripts/optimize.sh heartbeat install
 python3 scripts/heartbeat_optimizer.py plan
 ```
 
@@ -107,7 +117,7 @@ python3 scripts/heartbeat_optimizer.py cache-ttl
 
 ---
 
-## 🔍 Native OpenClaw Diagnostics (2026.2.15+)
+## Native OpenClaw Diagnostics (2026.2.15+, verified locally on 2026.6.8)
 
 ```
 /context list    → per-file token breakdown (use before applying bootstrap limits)
@@ -154,9 +164,9 @@ openclaw-token-optimizer/
 
 ---
 
-## 🔒 Security
+## Security
 
-All scripts are **local-only** — no network calls, no subprocess spawning, no system modifications. See [SECURITY.md](SECURITY.md) for full per-script audit.
+All scripts are **local-only** — no network calls and no dynamic code execution. Some explicit commands write local OpenClaw workspace state or templates; those writes are documented in [SECURITY.md](SECURITY.md).
 
 Verify integrity:
 ```bash
@@ -175,6 +185,7 @@ grep -r "urllib\|requests\|socket\|subprocess\|curl\|wget" scripts/
 
 See [CHANGELOG.md](CHANGELOG.md) for full version history.
 
+**v3.1.0** — Security-audit fixes, explicit workspace writes, OpenClaw 2026.6.x Sonnet/Opus compatibility
 **v1.4.2** — Security scanner fixes (provenance, optimize.sh manifest, SECURITY.md)  
 **v1.4.1** — `.clawhubignore` added (fixes public visibility)  
 **v1.4.0** — Native OpenClaw 2026.2.15 features (session pruning, bootstrap limits, cache TTL)  

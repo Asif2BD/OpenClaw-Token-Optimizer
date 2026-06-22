@@ -268,10 +268,10 @@ def generate_optimized_agents_md():
 
 ## 🔥 Model Selection (ENFORCED)
 
-**Simple conversations → HAIKU ONLY**
+**Simple conversations → SONNET**
 - Greetings, acknowledgments, simple questions
-- Never use Sonnet/Opus for casual chat
-- Override: `session_status model=haiku-4`
+- Keep responses brief to minimize tokens
+- No model override needed when Sonnet is your default
 
 **Standard work → SONNET**
 - Code writing, file edits, explanations
@@ -382,10 +382,26 @@ def main():
     
     elif command == "generate-agents":
         content = generate_optimized_agents_md()
-        output_path = Path.home() / ".openclaw/workspace/AGENTS.md.optimized"
-        output_path.write_text(content)
-        print(f"Generated optimized AGENTS.md at: {output_path}")
-        print("\nReview and replace your current AGENTS.md with this version.")
+        output_path = None
+
+        if "--output" in sys.argv:
+            idx = sys.argv.index("--output")
+            if idx + 1 >= len(sys.argv):
+                print("Usage: context_optimizer.py generate-agents --output <path>")
+                sys.exit(1)
+            output_path = Path(sys.argv[idx + 1]).expanduser()
+        elif "--workspace-output" in sys.argv:
+            output_path = Path.home() / ".openclaw/workspace/AGENTS.md.optimized"
+
+        if output_path:
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+            output_path.write_text(content)
+            print(f"Generated optimized AGENTS.md at: {output_path}")
+            print("\nReview it before replacing your current AGENTS.md.")
+        else:
+            print(content)
+            print("\n# No files were written. To save a copy, run:")
+            print("# context_optimizer.py generate-agents --output ~/.openclaw/workspace/AGENTS.md.optimized")
     
     else:
         print(f"Unknown command: {command}")

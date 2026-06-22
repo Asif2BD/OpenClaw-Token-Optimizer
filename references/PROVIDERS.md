@@ -5,9 +5,9 @@ Cost-effective alternatives to reduce token spend while maintaining quality.
 ## Provider Comparison
 
 ### Anthropic (Direct)
-- **Claude Opus 4**: $15/MTok (input), $75/MTok (output) — Best reasoning, use sparingly
+- **Claude Opus 4.5**: $15/MTok (input), $75/MTok (output) — Best reasoning, use sparingly
 - **Claude Sonnet 4.5**: $3/MTok (input), $15/MTok (output) — Balanced, recommended default
-- **Claude Haiku 4**: $0.25/MTok (input), $1.25/MTok (output) — Fast, cheap, great for simple tasks
+- Current OpenClaw Sonnet/Opus setups should treat Sonnet as the cheapest built-in tier.
 
 ### OpenRouter (Unified API)
 - **Gemini 2.0 Flash**: $0.075/MTok (both) — 40x cheaper than Sonnet, decent quality
@@ -47,7 +47,7 @@ Website: https://workers.cloudflare.com
 
 ### Task Classification
 
-**Simple tasks** → Haiku or Gemini Flash
+**Simple tasks** → Sonnet by default, or Gemini Flash if an external provider is configured
 - File reads, status checks, simple queries
 - Straightforward edits with clear instructions
 - Routine operations (list files, check logs)
@@ -68,11 +68,11 @@ Website: https://workers.cloudflare.com
 
 **Development/Testing:**
 1. Gemini 2.0 Flash Exp (free up to 10M/day)
-2. Haiku (cheap fallback)
+2. External cheap model fallback, if configured
 3. Sonnet (when quality matters)
 
 **Production (Hosting):**
-1. Haiku for 60% of tasks
+1. Sonnet or external cheap model for 60% of tasks
 2. Gemini Flash via OpenRouter for bulk operations
 3. Sonnet for user interactions
 4. Opus for critical decisions only
@@ -92,7 +92,7 @@ Website: https://workers.cloudflare.com
   "models": {
     "cheap": "google/gemini-2.5-flash",
     "balanced": "anthropic/claude-sonnet-4.5",
-    "smart": "anthropic/claude-opus-4"
+    "smart": "anthropic/claude-opus-4-5"
   }
 }
 ```
@@ -120,12 +120,12 @@ OpenClaw supports multiple keys for same provider → automatic rotation when ra
 
 **Example workload** (100K tokens/day):
 - **All Sonnet**: 100K × $3/MTok = $0.30/day = $9/month
-- **Smart routing** (60% Haiku, 30% Sonnet, 10% Opus):
+- **Smart routing** (60% routine tier, 30% Sonnet, 10% Opus):
   - 60K × $0.25 = $0.015
   - 30K × $3 = $0.09
   - 10K × $15 = $0.15
   - Total: $0.255/day = $7.65/month (**15% savings**)
-- **Aggressive routing** (80% Gemini, 15% Haiku, 5% Sonnet):
+- **Aggressive routing** (80% Gemini, 15% routine tier, 5% Sonnet):
   - 80K × $0.075 = $0.006
   - 15K × $0.25 = $0.00375
   - 5K × $3 = $0.015

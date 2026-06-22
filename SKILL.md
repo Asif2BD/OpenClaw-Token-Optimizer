@@ -1,7 +1,7 @@
 ---
 name: token-optimizer
-description: Reduce OpenClaw token usage and API costs through smart model routing, heartbeat optimization, budget tracking, and native 2026.2.15 features (session pruning, bootstrap size limits, cache TTL alignment). Use when token costs are high, API rate limits are being hit, or hosting multiple agents at scale. The 4 executable scripts (context_optimizer, model_router, heartbeat_optimizer, token_tracker) are local-only — no network requests, no subprocess calls, no system modifications. Reference files (PROVIDERS.md, config-patches.json) document optional multi-provider strategies that require external API keys and network access if you choose to use them. See SECURITY.md for full breakdown.
-version: 1.4.3
+description: Reduce OpenClaw token usage and API costs with lazy context loading, Sonnet/Opus-aware routing, heartbeat optimization, budget tracking, and native OpenClaw 2026.6.x features. Executable scripts are local-only and make no network requests; some explicit commands write local OpenClaw workspace state or templates. See SECURITY.md before running write commands.
+version: 3.1.0
 homepage: https://github.com/Asif2BD/OpenClaw-Token-Optimizer
 source: https://github.com/Asif2BD/OpenClaw-Token-Optimizer
 author: Asif2BD
@@ -13,6 +13,8 @@ security:
   scripts_no_code_execution: true
   scripts_no_subprocess: true
   scripts_data_local_only: true
+  explicit_workspace_writes: true
+  default_commands_no_overwrite: true
   reference_files_describe_external_services: true
   optimize_sh_is_convenience_wrapper: true
   optimize_sh_only_calls_bundled_python_scripts: true
@@ -26,10 +28,12 @@ Comprehensive toolkit for reducing token usage and API costs in OpenClaw deploym
 
 **Immediate actions** (no config changes needed):
 
-1. **Generate optimized AGENTS.md (BIGGEST WIN!):**
+1. **Preview optimized AGENTS.md (BIGGEST WIN!):**
    ```bash
    python3 scripts/context_optimizer.py generate-agents
-   # Creates AGENTS.md.optimized — review and replace your current AGENTS.md
+   # Prints optimized AGENTS.md to stdout without changing files
+   # To write a review copy:
+   python3 scripts/context_optimizer.py generate-agents --output ~/.openclaw/workspace/AGENTS.md.optimized
    ```
 
 2. **Check what context you ACTUALLY need:**
@@ -38,16 +42,18 @@ Comprehensive toolkit for reducing token usage and API costs in OpenClaw deploym
    # Shows: Only 2 files needed (not 50+!)
    ```
 
-3. **Install optimized heartbeat:**
+3. **Preview or install optimized heartbeat:**
    ```bash
-   cp assets/HEARTBEAT.template.md ~/.openclaw/workspace/HEARTBEAT.md
+   ./scripts/optimize.sh heartbeat
+   # To write HEARTBEAT.md with backup protection:
+   ./scripts/optimize.sh heartbeat install
    ```
 
 4. **Enforce cheaper models for casual chat:**
    ```bash
    python3 scripts/model_router.py "thanks!"
-   # Single-provider Anthropic setup: Use Sonnet, not Opus
-   # Multi-provider setup (OpenRouter/Together): Use Haiku for max savings
+   # OpenClaw 2026.6.x Sonnet/Opus setup: use Sonnet, not Opus
+   # Multi-provider setup (OpenRouter/Together): optional cheap external model
    ```
 
 5. **Check current token budget:**
@@ -123,11 +129,12 @@ if recommendation["context_level"] == "minimal":
     # Save ~80% tokens!
 ```
 
-**Generate optimized AGENTS.md:**
+**Preview optimized AGENTS.md:**
 ```bash
 context_optimizer.py generate-agents
-# Creates AGENTS.md.optimized with lazy loading instructions
-# Review and replace your current AGENTS.md
+# Prints lazy-loading instructions without changing files
+context_optimizer.py generate-agents --output ~/.openclaw/workspace/AGENTS.md.optimized
+# Writes a review copy; replace your current AGENTS.md only after review
 ```
 
 **Expected savings:** 50-80% reduction in context tokens.
@@ -145,13 +152,13 @@ python3 scripts/model_router.py "<user prompt>" [current_model] [force_tier]
 
 **Examples:**
 ```bash
-# Communication (NEW!) → ALWAYS Haiku
+# Communication (NEW!) → Sonnet in OpenClaw 2026.6.x
 python3 scripts/model_router.py "thanks!"
 python3 scripts/model_router.py "hi"
 python3 scripts/model_router.py "ok got it"
-→ Enforced: Haiku (NEVER Sonnet/Opus for casual chat)
+→ Enforced: cheap tier. In Sonnet/Opus-only OpenClaw, cheap tier is Sonnet.
 
-# Simple task → suggests Haiku
+# Simple task → suggests cheap tier
 python3 scripts/model_router.py "read the log file"
 
 # Medium task → suggests Sonnet
@@ -161,7 +168,7 @@ python3 scripts/model_router.py "write a function to parse JSON"
 python3 scripts/model_router.py "design a microservices architecture"
 ```
 
-**Patterns enforced to Haiku (NEVER Sonnet/Opus):**
+**Patterns enforced to cheap tier (never Opus):**
 
 *Communication:*
 - Greetings: hi, hey, hello, yo
@@ -197,8 +204,11 @@ Reduce API calls from heartbeat polling with smart interval tracking:
 
 **Setup:**
 ```bash
-# Copy template to workspace
-cp assets/HEARTBEAT.template.md ~/.openclaw/workspace/HEARTBEAT.md
+# Preview install command
+./scripts/optimize.sh heartbeat
+
+# Install template to workspace with backup protection
+./scripts/optimize.sh heartbeat install
 
 # Plan which checks should run
 python3 scripts/heartbeat_optimizer.py plan
@@ -242,13 +252,13 @@ After checking: `heartbeat_optimizer.py record email`
 
 **Expected savings:** 50% reduction in heartbeat API calls.
 
-**Model enforcement:** Heartbeat should ALWAYS use Haiku — see updated `HEARTBEAT.template.md` for model override instructions.
+**Model enforcement:** Heartbeat should use Sonnet in a Sonnet/Opus-only OpenClaw install, and should never use Opus unless a heartbeat task genuinely needs complex reasoning.
 
 ### 4. Cronjob Optimization (NEW!)
 
 **Problem:** Cronjobs often default to expensive models (Sonnet/Opus) even for routine tasks.
 
-**Solution:** Always specify Haiku for 90% of scheduled tasks.
+**Solution:** Keep 90% of scheduled tasks on the cheapest available tier. In the current Sonnet/Opus OpenClaw setup, that means Sonnet.
 
 **See:** `assets/cronjob-model-guide.md` for comprehensive guide with examples.
 
@@ -256,45 +266,45 @@ After checking: `heartbeat_optimizer.py record email`
 
 | Task Type | Model | Example |
 |-----------|-------|---------|
-| Monitoring/alerts | Haiku | Check server health, disk space |
-| Data parsing | Haiku | Extract CSV/JSON/logs |
-| Reminders | Haiku | Daily standup, backup reminders |
-| Simple reports | Haiku | Status summaries |
+| Monitoring/alerts | Sonnet | Check server health, disk space |
+| Data parsing | Sonnet | Extract CSV/JSON/logs |
+| Reminders | Sonnet | Daily standup, backup reminders |
+| Simple reports | Sonnet | Status summaries |
 | Content generation | Sonnet | Blog summaries (quality matters) |
 | Deep analysis | Sonnet | Weekly insights |
 | Complex reasoning | Never use Opus for cronjobs |
 
 **Example (good):**
 ```bash
-# Parse daily logs with Haiku
+# Parse daily logs with Sonnet
 cron add --schedule "0 2 * * *" \
   --payload '{
     "kind":"agentTurn",
     "message":"Parse yesterday error logs and summarize",
-    "model":"anthropic/claude-haiku-4"
+    "model":"anthropic/claude-sonnet-4-5"
   }' \
   --sessionTarget isolated
 ```
 
 **Example (bad):**
 ```bash
-# ❌ Using Opus for simple check (60x more expensive!)
+# Using Opus for simple check is wasteful
 cron add --schedule "*/15 * * * *" \
   --payload '{
     "kind":"agentTurn",
     "message":"Check email",
-    "model":"anthropic/claude-opus-4"
+    "model":"anthropic/claude-opus-4-5"
   }' \
   --sessionTarget isolated
 ```
 
-**Savings:** Using Haiku instead of Opus for 10 daily cronjobs = **$17.70/month saved per agent**.
+**Savings:** Using Sonnet instead of Opus for routine cronjobs is the main OpenClaw 2026.6.x saving; optional external cheap models can reduce cost further.
 
 **Integration with model_router:**
 ```bash
-# Test if your cronjob should use Haiku
+# Test if your cronjob should use the cheap tier
 model_router.py "parse daily error logs"
-# → Output: Haiku (background task pattern detected)
+# → Output: cheap tier / Sonnet (background task pattern detected)
 ```
 
 ### 5. Token Budget Tracking
@@ -344,8 +354,8 @@ result = subprocess.run(
 budget = json.loads(result.stdout)
 
 if budget["status"] == "exceeded":
-    # Switch to cheaper model or defer non-urgent work
-    use_model = "anthropic/claude-haiku-4"
+        # Switch to cheapest available model or defer non-urgent work
+        use_model = "anthropic/claude-sonnet-4-5"
 elif budget["status"] == "warning":
     # Use balanced model
     use_model = "anthropic/claude-sonnet-4-5"
@@ -367,7 +377,7 @@ See `references/PROVIDERS.md` for comprehensive guide on:
 
 | Provider | Model | Cost/MTok | Use Case |
 |----------|-------|-----------|----------|
-| Anthropic | Haiku 4 | $0.25 | Simple tasks |
+| Anthropic | Sonnet 4.5 | $3.00 | Default/routine tasks |
 | Anthropic | Sonnet 4.5 | $3.00 | Balanced default |
 | Anthropic | Opus 4 | $15.00 | Complex reasoning |
 | OpenRouter | Gemini 2.5 Flash | $0.075 | Bulk operations |
@@ -383,7 +393,7 @@ See `assets/config-patches.json` for advanced optimizations:
 - ✅ Token budget tracking (fully functional)
 - ✅ Model routing logic (fully functional)
 
-**Native OpenClaw 2026.2.15 — apply directly:**
+**Native OpenClaw 2026.6.x — apply directly after verifying your config schema:**
 - ✅ Session pruning (`contextPruning: cache-ttl`) — auto-trims old tool results after Anthropic cache TTL expires
 - ✅ Bootstrap size limits (`bootstrapMaxChars` / `bootstrapTotalMaxChars`) — caps workspace file injection size
 - ✅ Cache retention long (`cacheRetention: "long"` for Opus) — amortizes cache write costs
@@ -399,7 +409,7 @@ See `assets/config-patches.json` for advanced optimizations:
 gateway config.patch --patch '{"providers": [...]}'
 ```
 
-## Native OpenClaw Diagnostics (2026.2.15+)
+## Native OpenClaw Diagnostics (2026.2.15+ / verified locally on 2026.6.8)
 
 OpenClaw 2026.2.15 added built-in commands that complement this skill's Python scripts. Use these first for quick diagnostics before reaching for the scripts.
 
@@ -470,7 +480,7 @@ python3 scripts/heartbeat_optimizer.py cache-ttl 7200
 **Expected savings:** 20-30%
 
 ### For Managed Hosting (xCloud, etc.)
-1. Default all agents to Haiku
+1. Default routine/background work to Sonnet
 2. Route user interactions to Sonnet
 3. Reserve Opus for explicitly complex requests
 4. Use Gemini Flash for background operations
@@ -480,7 +490,7 @@ python3 scripts/heartbeat_optimizer.py cache-ttl 7200
 
 ### For High-Volume Deployments
 1. Use multi-provider fallback (OpenRouter + Together.ai)
-2. Implement aggressive routing (80% Gemini, 15% Haiku, 5% Sonnet)
+2. Implement aggressive routing only if external cheap providers are configured
 3. Deploy local Ollama for offline/cheap operations
 4. Batch heartbeat checks (every 2-4 hours, not 30 min)
 
@@ -503,7 +513,7 @@ status=$(echo $budget | jq -r .status)
 
 if [ "$status" = "exceeded" ]; then
     # Use cheapest model regardless of routing
-    model="anthropic/claude-haiku-4"
+    model="anthropic/claude-sonnet-4-5"
 fi
 
 # 4. Process with selected model
@@ -597,7 +607,7 @@ Without skill:
 - `PROVIDERS.md` — Alternative AI providers, pricing, and routing strategies
 
 ### Assets (3 total)
-- **`HEARTBEAT.template.md`** — Drop-in optimized heartbeat template with Haiku enforcement (ENHANCED!)
+- **`HEARTBEAT.template.md`** — Drop-in optimized heartbeat template with Sonnet/Opus-aware routing
 - **`cronjob-model-guide.md`** — Complete guide for choosing models in cronjobs (NEW!)
 - **`config-patches.json`** — Advanced configuration examples
 

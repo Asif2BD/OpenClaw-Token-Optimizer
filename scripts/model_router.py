@@ -28,14 +28,19 @@ def detect_provider():
     # Default to anthropic
     return "anthropic"
 
-# Model tiers per provider
+# Model tiers per provider.
+#
+# OpenClaw 2026.6.x installations commonly expose only Sonnet and Opus. In
+# that setup, "cheap" intentionally maps to Sonnet: the biggest safe saving is
+# avoiding Opus for routine work. Optional external providers can still map the
+# cheap tier to lower-cost models.
 PROVIDER_MODELS = {
     "anthropic": {
-        "cheap": "anthropic/claude-haiku-4",
+        "cheap": "anthropic/claude-sonnet-4-5",
         "balanced": "anthropic/claude-sonnet-4-5",
-        "smart": "anthropic/claude-opus-4",
+        "smart": "anthropic/claude-opus-4-5",
         "costs": {  # $/MTok (input)
-            "cheap": 0.25,
+            "cheap": 3.00,
             "balanced": 3.00,
             "smart": 15.00
         }
@@ -44,12 +49,10 @@ PROVIDER_MODELS = {
         "cheap": "openai/gpt-4.1-nano",
         "balanced": "openai/gpt-4.1-mini",
         "smart": "openai/gpt-4.1",
-        "premium": "openai/gpt-5",
         "costs": {
             "cheap": 0.10,
             "balanced": 0.40,
-            "smart": 2.00,
-            "premium": 10.00
+            "smart": 2.00
         }
     },
     "google": {
@@ -65,7 +68,7 @@ PROVIDER_MODELS = {
     "openrouter": {
         "cheap": "google/gemini-2.0-flash",
         "balanced": "anthropic/claude-sonnet-4-5",
-        "smart": "anthropic/claude-opus-4",
+        "smart": "anthropic/claude-opus-4-5",
         "costs": {
             "cheap": 0.075,
             "balanced": 3.00,
@@ -313,10 +316,9 @@ def route_task(prompt, current_model=None, force_tier=None, provider=None):
         "recommended_model": recommended_model,
         "tier": tier,
         "tier_display": {
-            "cheap": "Cheap (Haiku/Nano/Flash)",
+            "cheap": "Cheap (Sonnet/Nano/Flash)",
             "balanced": "Balanced (Sonnet/Mini/Flash)",
-            "smart": "Smart (Opus/GPT-4.1/Pro)",
-            "premium": "Premium (GPT-5)"
+            "smart": "Smart (Opus/GPT-4.1/Pro)"
         }.get(tier, tier),
         "confidence": confidence,
         "reasoning": reasoning,

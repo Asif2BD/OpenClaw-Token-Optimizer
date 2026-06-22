@@ -15,8 +15,9 @@ These are the actual working components of the skill.
 - **Network access:** None
 - **External API keys:** None required
 - **Code execution:** No eval/exec/compile
-- **Data storage:** Local JSON files in `~/.openclaw/workspace/memory/` only
-- **Verdict:** ✅ Safe to run
+- **Data storage:** Some commands write local JSON state files in `~/.openclaw/workspace/memory/`
+- **Workspace writes:** `generate-agents` writes only when `--output` or `--workspace-output` is supplied
+- **Verdict:** Safe to run when you understand which commands write local state
 
 ### Category 2: Reference Documentation (`references/PROVIDERS.md`, `assets/config-patches.json`)
 These are informational guides describing optional multi-provider strategies.
@@ -43,24 +44,24 @@ These are documentation-level references, not executable network code.
 
 `scripts/optimize.sh` is a **convenience CLI wrapper** — it does nothing except call the bundled Python scripts in this same directory. It is not an installer, not a downloader, and makes no network calls.
 
-**What it does (complete source):**
+**What it does (summary):**
 ```bash
 case "$1" in
     route|model)   python3 "$SCRIPT_DIR/model_router.py" "$@" ;;
-    context)       python3 "$SCRIPT_DIR/context_optimizer.py" generate-agents ;;
+    context)       python3 "$SCRIPT_DIR/context_optimizer.py" generate-agents "$@" ;;
     recommend)     python3 "$SCRIPT_DIR/context_optimizer.py" recommend "$2" ;;
     budget)        python3 "$SCRIPT_DIR/token_tracker.py" check ;;
-    heartbeat)     cp "$SCRIPT_DIR/../assets/HEARTBEAT.template.md" ~/.openclaw/workspace/HEARTBEAT.md ;;
+    heartbeat)     preview by default; `heartbeat install` writes HEARTBEAT.md after backup ;;
 esac
 ```
 
 **Security properties:**
-- ✅ No network requests
-- ✅ No system modifications
-- ✅ No subprocess spawning beyond the Python scripts already bundled
-- ✅ No eval, exec, or dynamic code execution
-- ✅ Only calls scripts already in this package (same directory via `$SCRIPT_DIR`)
-- ✅ Included in `.clawhubsafe` SHA256 manifest
+- No network requests
+- No eval, exec, or dynamic code execution
+- Only calls scripts already in this package (same directory via `$SCRIPT_DIR`)
+- Does not overwrite `HEARTBEAT.md` unless the user explicitly runs `heartbeat install`
+- Backs up an existing `HEARTBEAT.md` before replacing it
+- Included in `.clawhubsafe` SHA256 manifest
 
 **To verify before running:**
 ```bash
@@ -86,12 +87,12 @@ grep -E "curl|wget|nc |ncat|ssh|sudo|chmod|eval|exec\(" scripts/optimize.sh
 - Writes usage statistics to JSON
 
 **Security**:
-- ✅ No network requests
-- ✅ No code execution (no eval, exec, compile)
-- ✅ Only standard library imports: `json, re, pathlib, datetime`
-- ✅ Read/write permissions limited to OpenClaw workspace
-- ✅ No subprocess calls
-- ✅ No system modifications
+- No network requests
+- No code execution (no eval, exec, compile)
+- Only standard library imports: `json, re, pathlib, datetime`
+- State writes are limited to OpenClaw workspace memory when recording usage
+- `generate-agents` prints to stdout by default; file writes require `--output` or `--workspace-output`
+- No subprocess calls
 
 **Data Handling**:
 - Stores: File access counts, last access timestamps
@@ -109,11 +110,11 @@ grep -E "curl|wget|nc |ncat|ssh|sudo|chmod|eval|exec\(" scripts/optimize.sh
 - Enforces quiet hours (23:00-08:00)
 
 **Security**:
-- ✅ No network requests
-- ✅ No code execution
-- ✅ Only standard library imports: `json, os, datetime, pathlib`
-- ✅ Read/write limited to heartbeat state file
-- ✅ No system commands
+- No network requests
+- No code execution
+- Only standard library imports: `json, os, datetime, pathlib`
+- Read/write limited to heartbeat state file
+- No system commands
 
 **Data Handling**:
 - Stores: Last check timestamps, check intervals
@@ -131,11 +132,11 @@ grep -E "curl|wget|nc |ncat|ssh|sudo|chmod|eval|exec\(" scripts/optimize.sh
 - No state file (pure analysis)
 
 **Security**:
-- ✅ No network requests
-- ✅ No code execution
-- ✅ Only standard library imports: `json, re`
-- ✅ No file writes
-- ✅ Stateless operation
+- No network requests
+- No code execution
+- Only standard library imports: `json, re`
+- No file writes
+- Stateless operation
 
 **Data Handling**:
 - No data storage
@@ -153,11 +154,11 @@ grep -E "curl|wget|nc |ncat|ssh|sudo|chmod|eval|exec\(" scripts/optimize.sh
 - Records daily/monthly usage
 
 **Security**:
-- ✅ No network requests
-- ✅ No code execution
-- ✅ Only standard library imports: `json, os, datetime, pathlib`
-- ✅ Read/write limited to budget file
-- ✅ No system access
+- No network requests
+- No code execution
+- Only standard library imports: `json, os, datetime, pathlib`
+- Read/write limited to budget file for explicit reset/state operations
+- No system access
 
 **Data Handling**:
 - Stores: Usage totals, budget limits, alert thresholds

@@ -11,7 +11,7 @@
   "patches": {
     "session_pruning": {
       "description": "Auto-trim old tool results when Anthropic cache TTL expires — reduces cache write costs after idle sessions",
-      "implementation_status": "✅ Native OpenClaw 2026.2.15 feature — apply directly via gateway config.patch",
+      "implementation_status": "Native OpenClaw feature — verify against your 2026.6.x config schema before applying",
       "_category": "native_openclaw",
       "patch": {
         "agents": {
@@ -34,7 +34,7 @@
     },
     "bootstrap_size_limits": {
       "description": "Cap workspace file injection into system prompt — reduces system prompt bloat for agents with large AGENTS.md, MEMORY.md, or SOUL.md",
-      "implementation_status": "✅ Native OpenClaw 2026.2.15 feature — apply directly via gateway config.patch",
+      "implementation_status": "Native OpenClaw feature — verify against your 2026.6.x config schema before applying",
       "_category": "native_openclaw",
       "patch": {
         "agents": {
@@ -55,7 +55,7 @@
     },
     "cache_retention_long": {
       "description": "Set longer cache retention for Opus to amortize cache write costs on long reasoning sessions",
-      "implementation_status": "✅ Native OpenClaw 2026.2.15 feature — apply directly via gateway config.patch",
+      "implementation_status": "Native OpenClaw feature — verify against your 2026.6.x config schema before applying",
       "_category": "native_openclaw",
       "patch": {
         "agents": {
@@ -121,7 +121,7 @@
     "model_routing": {
       "description": "Route simple tasks to cheaper model tiers",
       "implementation_status": "⚠️ Partial — use model_router.py script for recommendations; native config routing pending",
-      "_note": "Haiku is available with multi-provider setups (OpenRouter, Together.ai). For single-provider Anthropic deployments, Sonnet is the minimum — use Sonnet for standard tasks, Opus only for complex reasoning.",
+      "_note": "For current Sonnet/Opus OpenClaw deployments, Sonnet is the minimum — use Sonnet for routine and standard tasks, Opus only for complex reasoning. External providers can be configured separately for cheaper background work.",
       "patch": {
         "agentConfig": {
           "modelRouting": {
@@ -200,7 +200,7 @@
             "priority": 2,
             "models": {
               "anthropic/claude-sonnet-4-5": "anthropic/claude-sonnet-4",
-              "anthropic/claude-haiku-4": "google/gemini-2.5-flash"
+              "anthropic/claude-sonnet-4-5": "google/gemini-2.5-flash"
             }
           },
           {
@@ -230,13 +230,13 @@
     "note": "native_openclaw patches apply directly. Other patches may require scripts, external APIs, or future OpenClaw updates."
   },
   "implementation_status_summary": {
-    "session_pruning": "✅ Native — apply now",
-    "bootstrap_size_limits": "✅ Native — apply now",
-    "cache_retention_long": "✅ Native — apply now",
-    "heartbeat_optimization": "✅ Script — fully functional",
-    "token_budgets": "✅ Script — fully functional",
-    "model_routing": "⚠️ Script only — config form pending",
-    "lazy_context": "⚠️ Script only — config form pending",
+    "session_pruning": "Native — verify schema before applying",
+    "bootstrap_size_limits": "Native — verify schema before applying",
+    "cache_retention_long": "Native — verify schema before applying",
+    "heartbeat_optimization": "Script — fully functional",
+    "token_budgets": "Script — fully functional",
+    "model_routing": "Script only — config form pending",
+    "lazy_context": "Script only — config form pending",
     "prompt_caching": "⏳ Verify Anthropic API status",
     "multi_provider": "⏳ Requires external API keys"
   }
