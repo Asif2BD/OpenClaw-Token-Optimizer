@@ -5,8 +5,8 @@
 An OpenClaw skill for smart model routing, lazy context loading, optimized heartbeats, budget tracking, and native OpenClaw 2026.6.x features (session pruning, bootstrap size limits, cache TTL alignment).
 
 [![ClawHub](https://img.shields.io/badge/ClawHub-openclaw--token--optimizer-blue)](https://clawhub.ai/Asif2BD/openclaw-token-optimizer)
-[![Version](https://img.shields.io/badge/version-3.1.0-green)](https://github.com/Asif2BD/OpenClaw-Token-Optimizer/blob/main/CHANGELOG.md)
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-yellow.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Version](https://img.shields.io/badge/version-3.2.0-green)](https://github.com/Asif2BD/OpenClaw-Token-Optimizer/blob/main/CHANGELOG.md)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![OpenClaw](https://img.shields.io/badge/OpenClaw-Skill-purple)](https://openclaw.ai)
 
 ---
@@ -41,9 +41,14 @@ Then add to `openclaw.json`:
 
 ---
 
-## What's New in v3.1.0 (OpenClaw 2026.6.x)
+## What's New in v3.2.0 (OpenClaw 2026.6.x)
 
-Security-audit fixes:
+ClawHub listing refresh:
+- Modernized the public skill card to match newer Asif2BD listings.
+- Clarified current OpenClaw Sonnet/Opus routing in the first viewport.
+- Highlighted security posture, audit-safe writes, quick commands, and file inventory.
+
+Security-audit fixes from v3.1:
 - `generate-agents` prints to stdout by default; file writes require `--output`.
 - `optimize.sh heartbeat` previews by default; `heartbeat install` writes with backup protection.
 - Documentation now says which commands write local workspace state.
@@ -185,6 +190,7 @@ grep -r "urllib\|requests\|socket\|subprocess\|curl\|wget" scripts/
 
 See [CHANGELOG.md](CHANGELOG.md) for full version history.
 
+**v3.2.0** — Modern ClawHub card, clearer security posture, OpenClaw 2026.6.x compatibility
 **v3.1.0** — Security-audit fixes, explicit workspace writes, OpenClaw 2026.6.x Sonnet/Opus compatibility
 **v1.4.2** — Security scanner fixes (provenance, optimize.sh manifest, SECURITY.md)  
 **v1.4.1** — `.clawhubignore` added (fixes public visibility)  

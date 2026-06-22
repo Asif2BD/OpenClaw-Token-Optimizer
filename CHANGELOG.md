@@ -2,6 +2,13 @@
 
 All notable changes to OpenClaw Token Optimizer are documented here.
 
+## [3.2.0] - 2026-06-22
+
+### Changed
+- Modernized the ClawHub skill card to match newer Asif2BD releases: stronger title, badges, GitHub/security links, current compatibility, quick commands, savings table, file inventory, and security posture.
+- Moved the public listing away from old v3.0-era Haiku/no-system-modification copy and toward OpenClaw 2026.6.x Sonnet/Opus guidance.
+- Updated README version badge and license badge to match the repository license.
+
 ## [3.1.0] - 2026-06-22
 
 ### Fixed
