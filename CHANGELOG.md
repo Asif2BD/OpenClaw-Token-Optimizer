@@ -2,6 +2,15 @@
 
 All notable changes to OpenClaw Token Optimizer are documented here.
 
+## [3.1.0] - 2026-06-22
+
+### Fixed
+- Addressed the ClawHub security audit's description/behavior mismatch by documenting explicit local workspace writes instead of claiming the skill makes no system modifications.
+- Changed `context_optimizer.py generate-agents` to print to stdout by default; writing `AGENTS.md.optimized` now requires `--output` or `--workspace-output`.
+- Changed `scripts/optimize.sh heartbeat` to preview by default; installing `HEARTBEAT.md` now requires `heartbeat install` and backs up an existing file first.
+- Updated model routing defaults for current OpenClaw 2026.6.x Sonnet/Opus deployments: routine work maps to Sonnet and complex reasoning maps to Opus.
+- Refreshed README, SECURITY.md, heartbeat, cronjob, and config-patch guidance for a safer release.
+
 ## [1.4.3] - 2026-02-18
 
 ### Fixed
