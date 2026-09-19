@@ -1,12 +1,12 @@
-# OpenClaw Token Optimizer — AI Cost Audit & Model Routing
+# Token Optimizer for OpenClaw & Hermes — AI Cost Audit & Model Routing
 
-[![Version](https://img.shields.io/badge/version-4.0.2-brightgreen.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-4.1.0-brightgreen.svg)](CHANGELOG.md)
 [![MissionDeck](https://img.shields.io/badge/MissionDeck-ai-blueviolet)](https://missiondeck.ai)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE.txt)
 
 Built by [MissionDeck.ai](https://missiondeck.ai) · [GitHub](https://github.com/Asif2BD/OpenClaw-Token-Optimizer) · [ClawHub](https://clawhub.ai/asif2bd/skills/openclaw-token-optimizer)
 
-**Find potential token waste in your OpenClaw agents with read-only audits of AI model routing, context size and scheduled automations.**
+**Find potential token waste in your OpenClaw and Hermes agents with read-only audits of AI model routing, context size and scheduled automations.**
 
 OpenClaw Token Optimizer inspects your actual model catalog and agent configuration,
 then produces local, evidence-based recommendations. It does not silently switch
@@ -31,14 +31,42 @@ Useful for multi-agent systems, recurring AI tasks and large instruction workspa
 ## Install from ClawHub
 
 ```bash
-clawhub install openclaw-token-optimizer --version 4.0.2
+clawhub install openclaw-token-optimizer --version 4.1.0
 ```
 
 Run commands from the installed skill directory. Requires **Python 3.10+**, with no
-third-party Python dependencies. Offline mode does not require OpenClaw. The live adapter
+third-party Python dependencies for OpenClaw or JSON inputs. Hermes YAML inputs need PyYAML (available in the Hermes Python environment). Offline mode does not require OpenClaw. The live adapter
 is verified against **OpenClaw 2026.9.4**; other versions are labeled unverified.
 
-For a manual installation, use the [versioned GitHub release](https://github.com/Asif2BD/OpenClaw-Token-Optimizer/releases/tag/v4.0.2).
+For a manual installation, use the [versioned GitHub release](https://github.com/Asif2BD/OpenClaw-Token-Optimizer/releases/tag/v4.1.0).
+
+## Hermes Agent support — read-only profile audit
+
+Use the **same skill and repository** for Hermes. The existing ClawHub slug is unchanged.
+Select the runtime explicitly; the default remains OpenClaw for backward compatibility.
+There is no runtime autodetection.
+
+```bash
+python3 scripts/optimizer.py audit --runtime hermes --live --hermes-home /path/to/hermes-profile --json
+python3 scripts/optimizer.py plan --runtime hermes --config /path/to/config.yaml --jobs /path/to/jobs.json --json
+```
+
+The Hermes adapter reads only the selected `config.yaml` and `cron/jobs.json`, or explicit
+exports. It never reads `.env`, authenticates, starts Hermes, executes scripts or changes
+configuration. YAML uses `yaml.safe_load`; use Hermes's Python environment or JSON exports.
+
+- Traces model precedence: job override → cron default → creation-time snapshot →
+  explicitly supplied `--hermes-model-env` → global configuration.
+- Recognizes paused jobs and `no_agent` scripts (no Hermes inference, not necessarily zero script cost).
+- Reviews frequent agent jobs and missing model/delivery evidence.
+- Shared context analysis and evidence-based routing remain available. Hermes routing requires
+  explicit normalized catalog/status exports; native discovery and authentication are **not** implemented.
+
+Validated against pinned Hermes source with its real cron storage module in an isolated
+profile. This is **file-schema/integration compatibility**, not a full authenticated Hermes
+inference test. Profile overlays, runtime aliases/fallbacks and absent environment values
+can alter effective behavior. See [Hermes compatibility](references/HERMES.md).
+Native usage ingestion, measured dollar savings and automatic budget alerts remain future work.
 
 ## Quick start: audit your OpenClaw agent
 
@@ -94,7 +122,7 @@ python3 scripts/optimizer.py budget --usage usage.json --limit 10 --json
 
 `usage.json` accepts an aggregate such as `{"costUSD":2.5,"complete":false}`.
 Without data, the result is unknown/null. **Automatic native usage ingestion, daily/weekly
-alerts and measured billing comparisons are not included in v4.0.2.**
+alerts and measured billing comparisons are not included in v4.1.0.**
 
 ## Offline audit and input formats
 
@@ -133,7 +161,7 @@ Exit **0** means analysis completed, not that no issues exist. Exit **2** means 
 input or a failed native read. Reports go to stdout; `--json` supports downstream tooling.
 `plan` intentionally emits no schema-blind patches. See [SECURITY.md](SECURITY.md).
 
-## What's fixed in v4.0.2?
+## What's fixed in v4.1.0?
 
 Native **heartbeat** and **systemEvent** jobs are now recognized. The optimizer no longer
 reports them as unknown or subjects them to agent-turn-only model/timeout/context checks.

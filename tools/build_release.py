@@ -4,7 +4,7 @@ import hashlib
 import shutil
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = '4.0.2'
+VERSION = '4.1.0'
 FILES = ['SKILL.md','README.md','CHANGELOG.md','LICENSE.txt','SECURITY.md']
 for folder in ('scripts','assets','references'):
     FILES.extend(str(p.relative_to(ROOT)) for p in (ROOT/folder).iterdir() if p.is_file() and p.suffix in ('.py','.sh','.md','.json'))

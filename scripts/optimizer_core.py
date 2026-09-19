@@ -5,7 +5,7 @@ import math
 def safe_id(value):
     return value if isinstance(value, str) and re.fullmatch(r'[A-Za-z0-9_.:/-]{1,160}', value) else '[redacted identifier]'
 
-VERSION = '4.0.2'
+VERSION = '4.1.0'
 
 def finding(code, severity, message):
     return {'code': code, 'severity': severity, 'message': message}

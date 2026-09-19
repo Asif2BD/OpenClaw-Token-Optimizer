@@ -1,7 +1,7 @@
 ---
 name: openclaw-token-optimizer
-description: "OpenClaw token optimization and AI cost auditing: inspect model routing, context size, cron jobs and heartbeats with read-only diagnostics and evidence-based recommendations."
-version: 4.0.2
+description: "Token optimization for OpenClaw and Hermes Agent: inspect model routing, context size, cron jobs and heartbeats with read-only diagnostics and evidence-based recommendations."
+version: 4.1.0
 author: Asif2BD
 homepage: https://missiondeck.ai
 source: https://github.com/Asif2BD/OpenClaw-Token-Optimizer
@@ -10,7 +10,7 @@ openclaw: ">=2026.9.4"
 metadata: {"openclaw":{"emoji":"💰","requires":{"bins":["python3"]}}}
 ---
 
-# OpenClaw Token Optimizer — AI Cost Audit & Model Routing
+# Token Optimizer for OpenClaw & Hermes
 
 Find potential token waste in OpenClaw agents without changing their configuration.
 Audit model availability, review automation settings, and inspect context size.
@@ -44,7 +44,20 @@ Built by [MissionDeck.ai](https://missiondeck.ai).
    The character/4 estimate is approximate; confirm actual injected cost with native
    `/context list` or `/context detail`. Never remove required instructions blindly.
 7. `budget --json` reports unknown without data. Optional `--usage PATH --limit USD`
-   accepts an explicit aggregate; native usage ingestion and alerts are not part of v4.0.
+   accepts an explicit aggregate; native usage ingestion and alerts are not implemented.
+
+## Hermes runtime
+
+Use `audit --runtime hermes --live --hermes-home /explicit/profile --json` to read only
+config.yaml and cron/jobs.json. Or supply explicit `--config` and `--jobs` exports.
+Never load `.env` or credentials. Never start Hermes or execute job scripts for this audit.
+Model evidence follows job → cron → creation snapshot → explicit `--hermes-model-env` →
+global default. Missing environment/overlay/authentication evidence stays unverified.
+`no_agent` avoids Hermes inference, not necessarily all script costs. Paused jobs are skipped.
+`plan` emits review actions only. Hermes `route` requires explicit normalized catalog/status;
+no native discovery is available. Use shared `context` and `budget` normally.
+Read references/HERMES.md for scope and pinned-source integration evidence.
+Default runtime remains OpenClaw; do not guess when both are installed.
 
 ## Native automation compatibility
 
@@ -67,7 +80,7 @@ remain visible for manual review.
 
 ## Requirements and provenance
 
-Python 3.10+, standard library only. OpenClaw is optional for offline mode; live adapter
+Python 3.10+; standard library for OpenClaw/JSON, optional PyYAML for Hermes YAML. OpenClaw is optional for offline mode; live adapter
 verified against 2026.9.4. No claim of compatibility with every future schema.
 [GitHub](https://github.com/Asif2BD/OpenClaw-Token-Optimizer) ·
 [MissionDeck.ai Cloud](https://missiondeck.ai) · See SECURITY.md for the trust boundary.

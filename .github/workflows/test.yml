@@ -15,6 +15,12 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '${{ matrix.python }}'
+      - run: python -m pip install PyYAML==6.0.3
       - run: python -m unittest discover -s tests -v
       - run: python -m py_compile scripts/*.py
       - run: sha256sum -c SHA256SUMS.txt
+      - name: Verify pinned Hermes storage compatibility
+        run: |
+          git clone --filter=blob:none --no-checkout https://github.com/NousResearch/hermes-agent.git /tmp/hermes-compat
+          git -C /tmp/hermes-compat checkout d7b836ab1c0cddaafc109ed24c9a83b6191cdc88
+          python tools/test_hermes_compat.py --source /tmp/hermes-compat

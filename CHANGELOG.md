@@ -1,5 +1,14 @@
 # Changelog
 
+## v4.1.0
+
+- Add explicit Hermes read-only adapter and isolated upstream cron-store compatibility test.
+- Resolve file-evidenced cron model precedence including creation snapshots.
+- Recognize no_agent/paused jobs; keep auth, runtime overlays and savings unverified.
+- Share the analysis engine and preserve OpenClaw behavior and existing installation slug.
+- Document runtime-specific requirements and compatibility boundaries.
+
+
 ## v4.0.2 — 2026-09-19
 
 - Fix false unknown-kind findings for native heartbeat and systemEvent jobs.

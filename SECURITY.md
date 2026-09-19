@@ -1,4 +1,4 @@
-# Security policy — OpenClaw Token Optimizer 4.0.2
+# Security policy — OpenClaw Token Optimizer 4.1.0
 
 ## Trust boundary
 
@@ -44,3 +44,10 @@ missing usage, auth/capability gates, no-shell execution, and read-only behavior
 No paid canary is run by the package. Catalog flags alone are not inference proof.
 
 Maintainer: [Asif2BD](https://github.com/Asif2BD) · [MissionDeck.ai](https://missiondeck.ai)
+
+## Hermes file adapter
+
+Only explicitly selected profile config/jobs files are read. JSON uses the standard library;
+YAML uses optional PyYAML safe_load (never unsafe constructors). The adapter does not read
+.env or credentials, import Hermes, execute jobs, start schedulers or make network requests.
+Selected model identifiers may appear in reports; raw prompts/scripts/config do not.
