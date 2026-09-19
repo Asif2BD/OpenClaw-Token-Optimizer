@@ -5,7 +5,7 @@ import math
 def safe_id(value):
     return value if isinstance(value, str) and re.fullmatch(r'[A-Za-z0-9_.:/-]{1,160}', value) else '[redacted identifier]'
 
-VERSION = '4.0.1'
+VERSION = '4.0.2'
 
 def finding(code, severity, message):
     return {'code': code, 'severity': severity, 'message': message}
@@ -114,7 +114,9 @@ def audit(catalog, status, config, jobs, sessions=None):
             continue
         payload = job.get('payload', {})
         label = f'Automation #{index + 1}'  # Never output job names, commands, or prompts.
-        if payload.get('kind') == 'command':
+        # Native heartbeat/system events use their own execution configuration.
+        # Do not apply agentTurn-only model/timeout/lightContext rules to them.
+        if payload.get('kind') in ('command', 'heartbeat', 'systemEvent'):
             continue
         if payload.get('kind') not in ('agentTurn', 'agent'):
             out.append(finding('automation_kind_unknown', 'info', f'{label}: payload kind not recognized; inspect manually.'))

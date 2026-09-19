@@ -1,113 +1,192 @@
-# OpenClaw Token Optimizer
+# OpenClaw Token Optimizer — AI Cost Audit & Model Routing
 
-[![Version](https://img.shields.io/badge/version-4.0.1-brightgreen.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-4.0.2-brightgreen.svg)](CHANGELOG.md)
 [![MissionDeck](https://img.shields.io/badge/MissionDeck-ai-blueviolet)](https://missiondeck.ai)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE.txt)
 
-Built by [MissionDeck.ai](https://missiondeck.ai) · [GitHub](https://github.com/Asif2BD/OpenClaw-Token-Optimizer)
+Built by [MissionDeck.ai](https://missiondeck.ai) · [GitHub](https://github.com/Asif2BD/OpenClaw-Token-Optimizer) · [ClawHub](https://clawhub.ai/asif2bd/skills/openclaw-token-optimizer)
 
-> Read-only, evidence-based audits of your real model catalog, context, and automations.
+**Find potential token waste in your OpenClaw agents with read-only audits of AI model routing, context size and scheduled automations.**
 
-## Overview
+OpenClaw Token Optimizer inspects your actual model catalog and agent configuration,
+then produces local, evidence-based recommendations. It does not silently switch
+models, rewrite instructions, change schedules or promise a percentage saving.
 
-v4 combines the compatibility refresh and native-aware core. No more static model
-ranking, blanket cache-warming schedules, or zero-cost reports when usage is missing.
-It does not silently modify your agent or promise a percentage saving.
+## What does OpenClaw Token Optimizer do?
 
-## Setup modes
+- **AI model routing:** select an eligible candidate from your own ordered model policy,
+  checking catalog availability, allowlists and required capabilities.
+- **Token context analysis:** rank explicitly selected files by size and identify duplicate
+  contents. Approximate token counts help prioritize a deeper native context review.
+- **Cron and automation auditing:** review agent-turn models, timeouts, delivery intent,
+  frequency and lightContext candidates without modifying jobs.
+- **Native heartbeat support:** recognize heartbeat and systemEvent payloads without
+  incorrectly applying agent-turn checks or labeling them unknown.
+- **Honest cost reporting:** missing usage stays unknown—not zero. No hard-coded pricing
+  or unverified cost-saving estimates.
+- **Local text and JSON reports:** use offline JSON exports or the installed OpenClaw CLI.
 
-- **OpenClaw agent:** install `clawhub install openclaw-token-optimizer --version 4.0.1`.
-- **Self-hosted/offline:** clone this repo and run Python 3.10+; no dependencies.
-- **MissionDeck Cloud:** [missiondeck.ai](https://missiondeck.ai) is the related agent
-  coordination product; this CLI remains local and has no cloud upload integration.
+Useful for multi-agent systems, recurring AI tasks and large instruction workspaces.
 
-## Quick start
+## Install from ClawHub
 
 ```bash
-python3 scripts/optimizer.py audit --live --agent oracle --json
-python3 scripts/optimizer.py plan --live --agent oracle --json
-python3 scripts/optimizer.py route --live --agent oracle --policy assets/config.example.json --tier research --json
-python3 scripts/optimizer.py context SOUL.md AGENTS.md --json
+clawhub install openclaw-token-optimizer --version 4.0.2
+```
+
+Run commands from the installed skill directory. Requires **Python 3.10+**, with no
+third-party Python dependencies. Offline mode does not require OpenClaw. The live adapter
+is verified against **OpenClaw 2026.9.4**; other versions are labeled unverified.
+
+For a manual installation, use the [versioned GitHub release](https://github.com/Asif2BD/OpenClaw-Token-Optimizer/releases/tag/v4.0.2).
+
+## Quick start: audit your OpenClaw agent
+
+```bash
+python3 scripts/optimizer.py audit --live --agent YOUR_AGENT --json
+```
+
+Replace `YOUR_AGENT` with your actual agent ID. To include config-level findings, provide
+an explicit local JSON file with `--config /path/to/config.json`. Its contents are not echoed.
+
+Generate a review plan with the same inputs:
+
+```bash
+python3 scripts/optimizer.py plan --live --agent YOUR_AGENT --json
+```
+
+The plan contains review actions, not automatic fixes. Model absence and missing metadata
+are reasons to investigate—not proof that a model or job is broken.
+
+## Choose a model using your policy
+
+```bash
+python3 scripts/optimizer.py route --live --agent YOUR_AGENT \
+  --policy assets/config.example.json --tier research --json
+```
+
+The bundled policy illustrates routine, balanced, research, coding and background tiers.
+Adapt it to your available providers and quality/cost preferences. It is not a universal
+ranking or live pricing database. Recommendations never activate a model.
+
+Add `--image`, `--tools` or `--context-tokens 8000` when the task requires those capabilities.
+Unknown capability metadata blocks the recommendation. In particular, many native catalogs
+do not expose `supportsTools`; lack of that field does not mean the model lacks tools.
+A separately authorized exact-route canary is needed before activation.
+
+## Inspect context size and duplicate instructions
+
+```bash
+python3 scripts/optimizer.py context /path/to/SOUL.md /path/to/AGENTS.md --json
+```
+
+Only explicitly named files are read. Reports show character counts, approximate tokens
+(character count divided by four), and duplicate content. They do not print file contents.
+Use OpenClaw's native `/context list` and `/context detail` to establish actual injected
+context. Do not remove essential agent instructions based on file size alone.
+
+## Check supplied usage without false zeros
+
+```bash
 python3 scripts/optimizer.py budget --json
+python3 scripts/optimizer.py budget --usage usage.json --limit 10 --json
 ```
 
-Replace `oracle` with your agent ID. `--live` runs only fixed read commands:
-`openclaw --version`, `openclaw models list --agent ID --all --json`, `openclaw models status --agent ID --json`,
-and (audit/plan only) `openclaw cron list --all --json`. These may contact configured
-Gateway/provider services through OpenClaw. No automatic auth probe or inference call.
+`usage.json` accepts an aggregate such as `{"costUSD":2.5,"complete":false}`.
+Without data, the result is unknown/null. **Automatic native usage ingestion, daily/weekly
+alerts and measured billing comparisons are not included in v4.0.2.**
 
-Offline equivalent:
+## Offline audit and input formats
 
 ```bash
-python3 scripts/optimizer.py audit --catalog catalog.json --status status.json --config config.json --jobs jobs.json --json
-python3 scripts/optimizer.py route --catalog catalog.json --status status.json --policy assets/config.example.json --tier routine --image --context-tokens 8000 --json
+python3 scripts/optimizer.py audit --catalog catalog.json --status status.json \
+  --config config.json --jobs jobs.json --json
 ```
 
-Inputs use native JSON shapes: catalog `{models:[{key,available,input,contextWindow}]}`,
-status `{allowed:[],auth:{missingProvidersInUse:[],modelRouteIssues:[]}}`, config
-`{agents:{defaults:{model:...},entries:{...}}}`, jobs `{jobs:[...]}`.
-Optional normalized sessions: `{sessions:[{agentId,model}]}` via `--sessions`.
-For tool routing, `--tools` requires explicit `supportsTools: true` in trusted catalog data.
-Native catalogs may omit that field; do not assume support.
+Native JSON shapes:
 
-## Commands and limits
+- Catalog: `{ "models": [{ "key": "provider/model", "available": true, "input": "text+image", "contextWindow": 32000 }] }`
+- Status: `{ "allowed": ["provider/model"], "auth": { "missingProvidersInUse": [], "modelRouteIssues": [] } }`
+- Config: `{ "agents": { "defaults": { "model": "provider/model" }, "entries": {} } }`
+- Automations: `{ "jobs": [] }`
+- Optional normalized sessions via `--sessions`: `{ "sessions": [{ "agentId": "example", "model": "provider/model" }] }`
 
-- **audit:** catalog/allowlist references, unknown availability, native route issues,
-  shared-provider fallbacks, session/default differences, frequent agent jobs,
-  timeout/model/lightContext/delivery review. Reports coverage and limitations.
-- **plan:** ranked review actions as JSON or text. `patches` is intentionally empty:
-  no schema-blind or automatic config changes. Apply changes separately after validation.
-- **route:** first eligible candidate in user preference order. Availability and allowlist
-  required. Optional image/tool/context checks are fail-closed. No price/quality inference.
-  A separate exact-model canary remains required before activation.
-- **context:** explicit files only; character counts, approximate tokens, exact duplicate
-  content detection. No recursive workspace scan, raw contents in output, or file edits.
-- **budget:** missing data is unknown, not zero. `--usage usage.json --limit 10` accepts
-  `{costUSD:2.5,complete:false}`. Automated native usage ingestion/alerts are deferred to v4.1.
+Inputs must be JSON, not JSON5. Missing inputs and paginated automation responses are
+explicitly marked as incomplete coverage. Tool capability may be supplied as
+`supportsTools: true` only when backed by trustworthy metadata.
 
-All commands print to stdout. Exit 0 means analysis completed, not that the configuration
-is fault-free. Exit 2 means invalid inputs/native read failure. `--json` is machine-readable.
-Reports are local; selected identifiers and file basenames can still be sensitive.
-Inputs are JSON, not JSON5, and limited to 8 MiB each. Native reads have a 45-second timeout.
-No prices or savings estimates are invented. Automation pagination is explicitly flagged.
+## Safety and operational limits
 
-## Migration from v3
+The pure analysis core has no I/O. Explicit live mode invokes fixed native read commands:
 
-This is a breaking major release. Legacy script names delegate to v4 subcommands, so
-old positional prompts, template installs, and state-writing commands are no longer supported.
-Use `optimizer.py --help` and the examples above. Existing state files are left untouched.
-The skill slug/frontmatter is consistently `openclaw-token-optimizer`. MIT LICENSE is retained.
-Do not replace your AGENTS.md or HEARTBEAT.md with generated templates.
+- `openclaw --version`
+- `openclaw models list --agent ID --all --json`
+- `openclaw models status --agent ID --json`
+- `openclaw cron list --all --json` (audit/plan only)
 
-## Verification
+These commands may contact your configured Gateway or providers and update native caches.
+The optimizer does not run paid inference probes, upload reports, install other software,
+or write your configuration. Native reads have a 45-second timeout; inputs have an 8 MiB
+size limit. Selected identifiers and basenames can still be private—review reports before sharing.
+
+Exit **0** means analysis completed, not that no issues exist. Exit **2** means invalid
+input or a failed native read. Reports go to stdout; `--json` supports downstream tooling.
+`plan` intentionally emits no schema-blind patches. See [SECURITY.md](SECURITY.md).
+
+## What's fixed in v4.0.2?
+
+Native **heartbeat** and **systemEvent** jobs are now recognized. The optimizer no longer
+reports them as unknown or subjects them to agent-turn-only model/timeout/context checks.
+Unknown future payload kinds remain visible. Recognition is not a full audit of those
+jobs' effective runtime settings.
+
+## Frequently asked questions
+
+### Does this automatically reduce OpenClaw API costs?
+
+No. It identifies review candidates. Savings depend on which changes you safely apply
+and must be measured on comparable workloads. There is no guaranteed savings percentage.
+
+### Does it work with OpenAI, Anthropic and other model providers?
+
+Routing uses your supplied/native catalog and policy instead of a fixed vendor list.
+Eligibility depends on your model availability, allowlist and capability evidence.
+Catalog availability alone is not proof that an exact authentication route will succeed.
+
+### Will it change my models, cron jobs or heartbeat schedule?
+
+No. All v4 commands are diagnostic. No restart is required to run the CLI.
+
+### Is the ClawHub package verifiable?
+
+Yes. From the extracted package directory:
+
+```bash
+sha256sum -c SHA256SUMS.txt
+```
+
+`LICENSE.txt` and `SHA256SUMS.txt` survive registry clients that filter extensionless files.
+Hashes verify integrity, not safety. Check the version-specific ClawHub security review too.
+
+## Development and migration
 
 ```bash
 python3 -m unittest discover -s tests -v
 python3 -m py_compile scripts/*.py
-sha256sum -c SHA256SUMS.txt
 ```
 
-CI runs tests on Python 3.10/3.12/3.13. The native adapter is tested locally against
-OpenClaw 2026.9.4; future schemas must be verified. Checksums attest integrity, not security
-approval. ClawHub's independent review status must be checked after publishing.
-
-## Security
-
-See [SECURITY.md](SECURITY.md). The pure core has no I/O; the optional live adapter uses
-fixed native read commands without a shell. No installation hooks or third-party dependencies.
-Package preparation excludes tests, CI, internal notes, caches and credentials.
+Tests are in the GitHub source, not the installed skill bundle. CI covers Python
+3.10/3.12/3.13. From v3, use the new CLI arguments: old script names are migration shims,
+not the former prompt classifiers or template installers. Existing state files are left
+untouched. MIT licensing is retained. See [CHANGELOG.md](CHANGELOG.md).
 
 ## MissionDeck.ai — Your Agent Command Center
 
-[MissionDeck.ai](https://missiondeck.ai) provides a dashboard for multi-agent coordination.
-The optimizer does not require a MissionDeck account and never uploads audit data there.
+[MissionDeck.ai](https://missiondeck.ai) is the related multi-agent coordination dashboard.
+This optimizer runs locally, requires no MissionDeck account and has no cloud upload integration.
 
 ## More by Asif2BD
 
-```bash
-clawhub search Asif2BD
-```
+Browse [Asif2BD on ClawHub](https://clawhub.ai/asif2bd) for other OpenClaw skills.
 
-[MissionDeck.ai](https://missiondeck.ai) · [OpenClaw 2026.9.4](https://docs.openclaw.ai/releases/2026.9.4)
-
-Packaging note: LICENSE.txt and SHA256SUMS.txt are included for registry clients that omit extensionless files. The original MIT LICENSE remains in GitHub.
+[MissionDeck.ai](https://missiondeck.ai) · [OpenClaw documentation](https://docs.openclaw.ai/) · [Source code](https://github.com/Asif2BD/OpenClaw-Token-Optimizer)

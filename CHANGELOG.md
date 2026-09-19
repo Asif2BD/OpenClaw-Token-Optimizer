@@ -1,5 +1,13 @@
 # Changelog
 
+## v4.0.2 — 2026-09-19
+
+- Fix false unknown-kind findings for native heartbeat and systemEvent jobs.
+- Keep agent-turn-only checks scoped to agent turns; preserve unknown-kind reporting.
+- Add three regression tests for native kinds, future kinds and agent-turn linting.
+- Rewrite README and ClawHub description for clear OpenClaw token optimization,
+  AI cost auditing, model routing and automation discovery, without savings guarantees.
+
 ## v4.0.1 — 2026-09-19
 
 - Ship LICENSE.txt and SHA256SUMS.txt through extension-filtering registry clients.

@@ -52,6 +52,18 @@ class CoreTests(unittest.TestCase):
     def test_disabled_and_command_jobs_not_flagged(self):
         jobs=[{'enabled':False,'payload':{'kind':'agentTurn'}},{'payload':{'kind':'command'}}]
         self.assertFalse(any(x['code'].startswith('automation') for x in audit(CAT,STATUS,{},jobs)['findings']))
+    def test_native_event_kinds_not_false_positives(self):
+        for kind in ('heartbeat', 'systemEvent'):
+            with self.subTest(kind=kind):
+                result=audit(CAT,STATUS,{},[{'enabled':True,'payload':{'kind':kind},'schedule':{'everyMs':60000}}])
+                self.assertFalse(any(f['code'].startswith('automation_') or f['code']=='frequent_agent_job' for f in result['findings']))
+    def test_unknown_future_kind_still_reported(self):
+        result=audit(CAT,STATUS,{},[{'payload':{'kind':'futureKind'}}])
+        self.assertIn('automation_kind_unknown',[f['code'] for f in result['findings']])
+    def test_agent_turn_lint_preserved(self):
+        result=audit(CAT,STATUS,{},[{'payload':{'kind':'agentTurn'},'schedule':{'everyMs':60000}}])
+        codes={f['code'] for f in result['findings']}
+        self.assertTrue({'automation_model_inherited','automation_timeout','automation_context','frequent_agent_job'} <= codes)
     def test_override(self):
         cfg={'agents':{'defaults':{'model':'vendor/fast'}}}
         self.assertIn('session_override',[x['code'] for x in audit(CAT,STATUS,cfg,[],[{'agentId':'a','model':'vendor/smart'}])['findings']])

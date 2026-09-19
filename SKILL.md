@@ -1,7 +1,7 @@
 ---
 name: openclaw-token-optimizer
-description: "Audit OpenClaw model routes, context and automations; produce read-only, evidence-based optimization plans without guessing savings or changing configuration."
-version: 4.0.1
+description: "OpenClaw token optimization and AI cost auditing: inspect model routing, context size, cron jobs and heartbeats with read-only diagnostics and evidence-based recommendations."
+version: 4.0.2
 author: Asif2BD
 homepage: https://missiondeck.ai
 source: https://github.com/Asif2BD/OpenClaw-Token-Optimizer
@@ -10,7 +10,21 @@ openclaw: ">=2026.9.4"
 metadata: {"openclaw":{"emoji":"💰","requires":{"bins":["python3"]}}}
 ---
 
-# OpenClaw Token Optimizer
+# OpenClaw Token Optimizer — AI Cost Audit & Model Routing
+
+Find potential token waste in OpenClaw agents without changing their configuration.
+Audit model availability, review automation settings, and inspect context size.
+
+**Best for:** multi-agent setups, scheduled agent jobs, and context-heavy workspaces.
+**Output:** local text or JSON recommendations; no guaranteed savings claims.
+
+## Quick start
+
+```bash
+python3 scripts/optimizer.py audit --live --agent YOUR_AGENT --json
+```
+
+Replace YOUR_AGENT with an existing agent ID. Offline JSON analysis is also supported.
 
 Built by [MissionDeck.ai](https://missiondeck.ai).
 
@@ -31,6 +45,13 @@ Built by [MissionDeck.ai](https://missiondeck.ai).
    `/context list` or `/context detail`. Never remove required instructions blindly.
 7. `budget --json` reports unknown without data. Optional `--usage PATH --limit USD`
    accepts an explicit aggregate; native usage ingestion and alerts are not part of v4.0.
+
+## Native automation compatibility
+
+Recognizes agentTurn/agent, command, heartbeat and systemEvent payloads. Agent-turn
+model, timeout and lightContext checks apply only to agent turns. Heartbeat/systemEvent
+recognition is not a full audit of their effective execution settings. Unknown future kinds
+remain visible for manual review.
 
 ## Constraints
 
