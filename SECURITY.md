@@ -3,14 +3,14 @@
 ## Trust boundary
 
 This is a local read-only analysis package. It contains Python standard-library scripts
-and a shell launcher. There are no install hooks, external Python dependencies, telemetry,
+and a shell launcher. Hermes YAML parsing additionally uses optional PyYAML. There are no install hooks, telemetry,
 credential collectors, dynamic code evaluation, or automatic config changes.
 
 ## File behavior
 
 - `optimizer_core.py`: pure analysis functions; no files, network or processes.
 - `optimizer.py`: reads explicitly supplied JSON/context files and prints selected analysis.
-  `--live` invokes only fixed `openclaw --version`, `openclaw models list`, `models status`, and `cron list` read
+  For the OpenClaw runtime, `--live` invokes only fixed `openclaw --version`, `openclaw models list`, `models status`, and `cron list` read
   commands with `subprocess.run`, argv lists, no shell, and a timeout. The installed OpenClaw
   executable and configured Gateway/providers are trusted dependencies. They may perform
   network requests; therefore we do NOT claim that live mode is offline or network-free.
