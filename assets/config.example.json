@@ -1,28 +1,9 @@
 {
-  "description": "Token Optimizer configuration example",
-  "notes": "Copy to ~/.openclaw/token-optimizer.json and customize",
-  
-  "provider": "anthropic",
-  
-  "budgets": {
-    "daily": 100000,
-    "monthly": 2000000,
-    "alert_threshold": 0.8
-  },
-  
-  "model_overrides": {
-    "cheap": null,
-    "balanced": null,
-    "smart": null
-  },
-  
-  "heartbeat": {
-    "interval_minutes": 30,
-    "batch_checks": true
-  },
-  
-  "context": {
-    "always_load": ["SOUL.md", "IDENTITY.md"],
-    "lazy_load": true
+  "tiers": {
+    "routine": ["openai/gpt-5.6-luna", "openai/gpt-5.6-terra"],
+    "balanced": ["openai/gpt-5.6-sol"],
+    "research": ["openai/gpt-6-astra"],
+    "coding": ["openai/gpt-6-astra", "openai/gpt-5.6-sol"],
+    "background": ["openai/gpt-5.6-luna"]
   }
 }

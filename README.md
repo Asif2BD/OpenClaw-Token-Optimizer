@@ -1,209 +1,112 @@
 # OpenClaw Token Optimizer
 
-**Reduce OpenClaw token usage and API costs by 50-80%**
+[![Version](https://img.shields.io/badge/version-4.0.0-brightgreen.svg)](CHANGELOG.md)
+[![MissionDeck](https://img.shields.io/badge/MissionDeck-ai-blueviolet)](https://missiondeck.ai)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-An OpenClaw skill for smart model routing, lazy context loading, optimized heartbeats, budget tracking, and native OpenClaw 2026.6.x features (session pruning, bootstrap size limits, cache TTL alignment).
+Built by [MissionDeck.ai](https://missiondeck.ai) · [GitHub](https://github.com/Asif2BD/OpenClaw-Token-Optimizer)
 
-[![ClawHub](https://img.shields.io/badge/ClawHub-openclaw--token--optimizer-blue)](https://clawhub.ai/Asif2BD/openclaw-token-optimizer)
-[![Version](https://img.shields.io/badge/version-3.2.0-green)](https://github.com/Asif2BD/OpenClaw-Token-Optimizer/blob/main/CHANGELOG.md)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![OpenClaw](https://img.shields.io/badge/OpenClaw-Skill-purple)](https://openclaw.ai)
+> Read-only, evidence-based audits of your real model catalog, context, and automations.
 
----
+## Overview
 
-## 🚀 Installation
+v4 combines the compatibility refresh and native-aware core. No more static model
+ranking, blanket cache-warming schedules, or zero-cost reports when usage is missing.
+It does not silently modify your agent or promise a percentage saving.
 
-### Option 1: ClawHub (recommended)
+## Setup modes
+
+- **OpenClaw agent:** install `clawhub install openclaw-token-optimizer`.
+- **Self-hosted/offline:** clone this repo and run Python 3.10+; no dependencies.
+- **MissionDeck Cloud:** [missiondeck.ai](https://missiondeck.ai) is the related agent
+  coordination product; this CLI remains local and has no cloud upload integration.
+
+## Quick start
+
 ```bash
-clawhub install Asif2BD/openclaw-token-optimizer
+python3 scripts/optimizer.py audit --live --agent oracle --json
+python3 scripts/optimizer.py plan --live --agent oracle --json
+python3 scripts/optimizer.py route --live --agent oracle --policy assets/config.example.json --tier research --json
+python3 scripts/optimizer.py context SOUL.md AGENTS.md --json
+python3 scripts/optimizer.py budget --json
 ```
 
-Or browse to: [clawhub.ai/Asif2BD/openclaw-token-optimizer](https://clawhub.ai/Asif2BD/openclaw-token-optimizer)
+Replace `oracle` with your agent ID. `--live` runs only fixed read commands:
+`openclaw --version`, `openclaw models list --agent ID --all --json`, `openclaw models status --agent ID --json`,
+and (audit/plan only) `openclaw cron list --all --json`. These may contact configured
+Gateway/provider services through OpenClaw. No automatic auth probe or inference call.
 
-### Option 2: Manual (GitHub)
+Offline equivalent:
+
 ```bash
-git clone https://github.com/Asif2BD/OpenClaw-Token-Optimizer.git \
-  ~/.openclaw/skills/openclaw-token-optimizer
-```
-Then add to `openclaw.json`:
-```json
-{
-  "skills": {
-    "load": {
-      "extraDirs": ["~/.openclaw/skills/openclaw-token-optimizer"]
-    }
-  }
-}
+python3 scripts/optimizer.py audit --catalog catalog.json --status status.json --config config.json --jobs jobs.json --json
+python3 scripts/optimizer.py route --catalog catalog.json --status status.json --policy assets/config.example.json --tier routine --image --context-tokens 8000 --json
 ```
 
-### One-line install prompt for your agent
-> "Install the OpenClaw Token Optimizer skill from https://clawhub.ai/Asif2BD/openclaw-token-optimizer — or if ClawHub isn't available, clone https://github.com/Asif2BD/OpenClaw-Token-Optimizer and add the path to skills.load.extraDirs in openclaw.json"
+Inputs use native JSON shapes: catalog `{models:[{key,available,input,contextWindow}]}`,
+status `{allowed:[],auth:{missingProvidersInUse:[],modelRouteIssues:[]}}`, config
+`{agents:{defaults:{model:...},entries:{...}}}`, jobs `{jobs:[...]}`.
+Optional normalized sessions: `{sessions:[{agentId,model}]}` via `--sessions`.
+For tool routing, `--tools` requires explicit `supportsTools: true` in trusted catalog data.
+Native catalogs may omit that field; do not assume support.
 
----
+## Commands and limits
 
-## What's New in v3.2.0 (OpenClaw 2026.6.x)
+- **audit:** catalog/allowlist references, unknown availability, native route issues,
+  shared-provider fallbacks, session/default differences, frequent agent jobs,
+  timeout/model/lightContext/delivery review. Reports coverage and limitations.
+- **plan:** ranked review actions as JSON or text. `patches` is intentionally empty:
+  no schema-blind or automatic config changes. Apply changes separately after validation.
+- **route:** first eligible candidate in user preference order. Availability and allowlist
+  required. Optional image/tool/context checks are fail-closed. No price/quality inference.
+  A separate exact-model canary remains required before activation.
+- **context:** explicit files only; character counts, approximate tokens, exact duplicate
+  content detection. No recursive workspace scan, raw contents in output, or file edits.
+- **budget:** missing data is unknown, not zero. `--usage usage.json --limit 10` accepts
+  `{costUSD:2.5,complete:false}`. Automated native usage ingestion/alerts are deferred to v4.1.
 
-ClawHub listing refresh:
-- Modernized the public skill card to match newer Asif2BD listings.
-- Clarified current OpenClaw Sonnet/Opus routing in the first viewport.
-- Highlighted security posture, audit-safe writes, quick commands, and file inventory.
+All commands print to stdout. Exit 0 means analysis completed, not that the configuration
+is fault-free. Exit 2 means invalid inputs/native read failure. `--json` is machine-readable.
+Reports are local; selected identifiers and file basenames can still be sensitive.
+Inputs are JSON, not JSON5, and limited to 8 MiB each. Native reads have a 45-second timeout.
+No prices or savings estimates are invented. Automation pagination is explicitly flagged.
 
-Security-audit fixes from v3.1:
-- `generate-agents` prints to stdout by default; file writes require `--output`.
-- `optimize.sh heartbeat` previews by default; `heartbeat install` writes with backup protection.
-- Documentation now says which commands write local workspace state.
-- Model routing defaults to Sonnet/Opus for current OpenClaw installs.
+## Migration from v3
 
-## Native OpenClaw Features
+This is a breaking major release. Legacy script names delegate to v4 subcommands, so
+old positional prompts, template installs, and state-writing commands are no longer supported.
+Use `optimizer.py --help` and the examples above. Existing state files are left untouched.
+The skill slug/frontmatter is consistently `openclaw-token-optimizer`. MIT LICENSE is retained.
+Do not replace your AGENTS.md or HEARTBEAT.md with generated templates.
 
-Three **native config patches** that work today with zero external dependencies:
+## Verification
 
-### Session Pruning
-Auto-trim old tool results when the Anthropic cache TTL expires — reduces cache re-write costs.
-```json
-{ "agents": { "defaults": { "contextPruning": { "mode": "cache-ttl", "ttl": "5m" } } } }
-```
-
-### Bootstrap Size Limits
-Cap workspace file injection into the system prompt (20-40% reduction for large workspaces).
-```json
-{ "agents": { "defaults": { "bootstrapMaxChars": 10000, "bootstrapTotalMaxChars": 15000 } } }
-```
-
-### Cache Retention for Opus
-Amortize cache write costs on long Opus sessions.
-```json
-{ "agents": { "defaults": { "models": { "anthropic/claude-opus-4-5": { "params": { "cacheRetention": "long" } } } } } }
-```
-
-### Cache TTL Heartbeat Alignment
-Keep the Anthropic 1h prompt cache warm — avoid the re-write penalty.
 ```bash
-python3 scripts/heartbeat_optimizer.py cache-ttl
-# → recommended_interval: 55min (3300s)
-```
-
----
-
-## 🛠️ Quick Start
-
-**1. Context optimization (biggest win):**
-```bash
-python3 scripts/context_optimizer.py recommend "hi, how are you?"
-# → Load only 2 files, skip everything else → ~80% savings
-```
-
-**2. Model routing:**
-```bash
-python3 scripts/model_router.py "design a microservices architecture"
-# → Complex task → Opus
-python3 scripts/model_router.py "thanks!"
-# → Simple ack → Sonnet (cheapest available)
-```
-
-**3. Optimized heartbeat:**
-```bash
-./scripts/optimize.sh heartbeat
-# To install with backup protection:
-./scripts/optimize.sh heartbeat install
-python3 scripts/heartbeat_optimizer.py plan
-```
-
-**4. Token budget check:**
-```bash
-python3 scripts/token_tracker.py check
-```
-
-**5. Cache TTL alignment:**
-```bash
-python3 scripts/heartbeat_optimizer.py cache-ttl
-# Set heartbeat to 55min to keep Anthropic 1h cache warm
-```
-
----
-
-## Native OpenClaw Diagnostics (2026.2.15+, verified locally on 2026.6.8)
-
-```
-/context list    → per-file token breakdown (use before applying bootstrap limits)
-/context detail  → full system prompt breakdown
-/usage tokens    → append token count to every reply
-/usage cost      → cumulative cost summary
-```
-
----
-
-## 📁 Skill Structure
-
-```
-openclaw-token-optimizer/
-├── SKILL.md                    ← Skill definition (loaded by OpenClaw)
-├── SECURITY.md                 ← Full security audit + provenance
-├── CHANGELOG.md                ← Version history
-├── .clawhubsafe                ← SHA256 integrity manifest (13 files)
-├── .clawhubignore              ← Files excluded from publish bundle
-├── scripts/
-│   ├── context_optimizer.py    ← Context lazy-loading
-│   ├── model_router.py         ← Task classification + model routing
-│   ├── heartbeat_optimizer.py  ← Interval management + cache-ttl alignment
-│   ├── token_tracker.py        ← Budget monitoring
-│   └── optimize.sh             ← Convenience CLI wrapper (calls Python scripts)
-├── assets/
-│   ├── config-patches.json     ← Ready-to-apply config patches
-│   ├── HEARTBEAT.template.md   ← Drop-in optimized heartbeat template
-│   └── cronjob-model-guide.md  ← Model selection for cron tasks
-└── references/
-    └── PROVIDERS.md            ← Multi-provider strategy guide
-```
-
----
-
-## 📊 Expected Savings
-
-| Strategy | Context | Model | Monthly (100K tok/day) | Savings |
-|---|---|---|---|---|
-| Baseline (no optimization) | 50K | Sonnet | $9.00 | 0% |
-| Context optimization only | 10K | Sonnet | $5.40 | 40% |
-| Model routing only | 50K | Mixed | $5.40 | 40% |
-| **Both (this skill)** | **10K** | **Mixed** | **$2.70** | **70%** |
-
----
-
-## Security
-
-All scripts are **local-only** — no network calls and no dynamic code execution. Some explicit commands write local OpenClaw workspace state or templates; those writes are documented in [SECURITY.md](SECURITY.md).
-
-Verify integrity:
-```bash
-cd ~/.openclaw/skills/openclaw-token-optimizer
+python3 -m unittest discover -s tests -v
+python3 -m py_compile scripts/*.py
 sha256sum -c .clawhubsafe
 ```
 
-Quick audit (should return nothing):
+CI runs tests on Python 3.10/3.12/3.13. The native adapter is tested locally against
+OpenClaw 2026.9.4; future schemas must be verified. Checksums attest integrity, not security
+approval. ClawHub's independent review status must be checked after publishing.
+
+## Security
+
+See [SECURITY.md](SECURITY.md). The pure core has no I/O; the optional live adapter uses
+fixed native read commands without a shell. No installation hooks or third-party dependencies.
+Package preparation excludes tests, CI, internal notes, caches and credentials.
+
+## MissionDeck.ai — Your Agent Command Center
+
+[MissionDeck.ai](https://missiondeck.ai) provides a dashboard for multi-agent coordination.
+The optimizer does not require a MissionDeck account and never uploads audit data there.
+
+## More by Asif2BD
+
 ```bash
-grep -r "urllib\|requests\|socket\|subprocess\|curl\|wget" scripts/
+clawhub install jarvis-mission-control
+clawhub search Asif2BD
 ```
 
----
-
-## 📜 Changelog
-
-See [CHANGELOG.md](CHANGELOG.md) for full version history.
-
-**v3.2.0** — Modern ClawHub card, clearer security posture, OpenClaw 2026.6.x compatibility
-**v3.1.0** — Security-audit fixes, explicit workspace writes, OpenClaw 2026.6.x Sonnet/Opus compatibility
-**v1.4.2** — Security scanner fixes (provenance, optimize.sh manifest, SECURITY.md)  
-**v1.4.1** — `.clawhubignore` added (fixes public visibility)  
-**v1.4.0** — Native OpenClaw 2026.2.15 features (session pruning, bootstrap limits, cache TTL)  
-**v1.3.3** — Correct display name on ClawHub  
-**v1.3.2** — Security audit, SECURITY.md, .clawhubsafe manifest  
-
----
-
-## 🔗 Links
-
-- **ClawHub:** https://clawhub.ai/Asif2BD/openclaw-token-optimizer
-- **GitHub:** https://github.com/Asif2BD/OpenClaw-Token-Optimizer
-- **OpenClaw Docs:** https://docs.openclaw.ai
-- **License:** Apache 2.0
-- **Author:** [Asif2BD](https://github.com/Asif2BD)
+[MissionDeck.ai](https://missiondeck.ai) · [OpenClaw 2026.9.4](https://docs.openclaw.ai/releases/2026.9.4)

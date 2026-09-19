@@ -1,5 +1,20 @@
-# Development artifacts — not part of the published skill
-PR-DESCRIPTION.md
-docs/
 .git/
+.github/
 .gitignore
+tests/
+docs/
+__pycache__/
+*.pyc
+*.log
+.env
+.env.*
+node_modules/
+.mission-control/
+openclaw.json
+*.state.json
+*.sqlite
+*.db
+PR-DESCRIPTION.md
+
+tools/
+dist/

@@ -1,5 +1,18 @@
 # Changelog
 
+## v4.0.0 — 2026-09-19
+
+- Combined compatibility refresh and native-aware audit core.
+- Added read-only audit/plan, ordered policy routing, context sizing/duplicates,
+  automation linting, coverage flags and honest missing-usage handling.
+- Added optional fixed-command OpenClaw adapter and offline JSON mode.
+- Removed obsolete static model/pricing tables, blanket 55-minute cache guidance,
+  generated workspace instructions, and unmeasured percentage-saving claims.
+- Preserved MIT license; unified slug/version; added regression tests and CI.
+- Breaking: legacy entrypoints now delegate to explicit v4 CLI arguments.
+- Native usage ingestion, automatic budgets, auto-apply and benchmarking remain outside v4.0.
+
+
 All notable changes to OpenClaw Token Optimizer are documented here.
 
 ## [3.2.0] - 2026-06-22
