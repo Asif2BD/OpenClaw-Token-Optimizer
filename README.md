@@ -1,6 +1,6 @@
 # OpenClaw Token Optimizer
 
-[![Version](https://img.shields.io/badge/version-4.0.0-brightgreen.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-4.0.1-brightgreen.svg)](CHANGELOG.md)
 [![MissionDeck](https://img.shields.io/badge/MissionDeck-ai-blueviolet)](https://missiondeck.ai)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
@@ -16,7 +16,7 @@ It does not silently modify your agent or promise a percentage saving.
 
 ## Setup modes
 
-- **OpenClaw agent:** install `clawhub install openclaw-token-optimizer`.
+- **OpenClaw agent:** install `clawhub install openclaw-token-optimizer --version 4.0.1`.
 - **Self-hosted/offline:** clone this repo and run Python 3.10+; no dependencies.
 - **MissionDeck Cloud:** [missiondeck.ai](https://missiondeck.ai) is the related agent
   coordination product; this CLI remains local and has no cloud upload integration.
@@ -84,7 +84,7 @@ Do not replace your AGENTS.md or HEARTBEAT.md with generated templates.
 ```bash
 python3 -m unittest discover -s tests -v
 python3 -m py_compile scripts/*.py
-sha256sum -c .clawhubsafe
+sha256sum -c SHA256SUMS.txt
 ```
 
 CI runs tests on Python 3.10/3.12/3.13. The native adapter is tested locally against
@@ -105,8 +105,9 @@ The optimizer does not require a MissionDeck account and never uploads audit dat
 ## More by Asif2BD
 
 ```bash
-clawhub install jarvis-mission-control
 clawhub search Asif2BD
 ```
 
 [MissionDeck.ai](https://missiondeck.ai) · [OpenClaw 2026.9.4](https://docs.openclaw.ai/releases/2026.9.4)
+
+Packaging note: LICENSE.txt and SHA256SUMS.txt are included for registry clients that omit extensionless files. The original MIT LICENSE remains in GitHub.

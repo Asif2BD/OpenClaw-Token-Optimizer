@@ -5,12 +5,12 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 class ReleaseTests(unittest.TestCase):
     def test_version_consistent(self):
-        self.assertIn('version: 4.0.0',(ROOT/'SKILL.md').read_text())
-        self.assertIn('version-4.0.0-',(ROOT/'README.md').read_text())
-        self.assertIn('## v4.0.0',(ROOT/'CHANGELOG.md').read_text())
-        self.assertIn('# Version: 4.0.0',(ROOT/'.clawhubsafe').read_text())
+        self.assertIn('version: 4.0.1',(ROOT/'SKILL.md').read_text())
+        self.assertIn('version-4.0.1-',(ROOT/'README.md').read_text())
+        self.assertIn('## v4.0.1',(ROOT/'CHANGELOG.md').read_text())
+        self.assertIn('# Version: 4.0.1',(ROOT/'SHA256SUMS.txt').read_text())
     def test_manifest_and_secrets(self):
-        for line in (ROOT/'.clawhubsafe').read_text().splitlines():
+        for line in (ROOT/'SHA256SUMS.txt').read_text().splitlines():
             if line.startswith('#'):continue
             digest,name=line.split('  ',1)
             data=(ROOT/name).read_bytes()

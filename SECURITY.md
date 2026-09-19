@@ -1,4 +1,4 @@
-# Security policy — OpenClaw Token Optimizer 4.0.0
+# Security policy — OpenClaw Token Optimizer 4.0.1
 
 ## Trust boundary
 
@@ -39,7 +39,7 @@ A checksum manifest is not proof of safety and cannot guarantee a third-party re
 Do not dismiss a scanner finding as a false positive without examining its evidence.
 
 Run `python3 -m unittest discover -s tests -v` from GitHub source and
-`sha256sum -c .clawhubsafe` against the distributed package. Tests cover malformed inputs,
+`sha256sum -c SHA256SUMS.txt` against the distributed package. Tests cover malformed inputs,
 missing usage, auth/capability gates, no-shell execution, and read-only behavior.
 No paid canary is run by the package. Catalog flags alone are not inference proof.
 

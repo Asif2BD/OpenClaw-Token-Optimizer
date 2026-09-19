@@ -1,5 +1,11 @@
 # Changelog
 
+## v4.0.1 — 2026-09-19
+
+- Ship LICENSE.txt and SHA256SUMS.txt through extension-filtering registry clients.
+- Pin the installation example; verify actual published file hashes.
+- No change to the read-only audit behavior.
+
 ## v4.0.0 — 2026-09-19
 
 - Combined compatibility refresh and native-aware audit core.

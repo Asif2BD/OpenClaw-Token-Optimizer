@@ -1,7 +1,7 @@
 ---
 name: openclaw-token-optimizer
 description: "Audit OpenClaw model routes, context and automations; produce read-only, evidence-based optimization plans without guessing savings or changing configuration."
-version: 4.0.0
+version: 4.0.1
 author: Asif2BD
 homepage: https://missiondeck.ai
 source: https://github.com/Asif2BD/OpenClaw-Token-Optimizer
