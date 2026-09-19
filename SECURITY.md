@@ -1,4 +1,4 @@
-# Security policy — OpenClaw Token Optimizer 4.1.0
+# Security policy — OpenClaw Token Optimizer 4.1.1
 
 ## Trust boundary
 

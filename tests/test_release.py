@@ -5,10 +5,10 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 class ReleaseTests(unittest.TestCase):
     def test_version_consistent(self):
-        self.assertIn('version: 4.1.0',(ROOT/'SKILL.md').read_text())
-        self.assertIn('version-4.1.0-',(ROOT/'README.md').read_text())
-        self.assertIn('## v4.1.0',(ROOT/'CHANGELOG.md').read_text())
-        self.assertIn('# Version: 4.1.0',(ROOT/'SHA256SUMS.txt').read_text())
+        self.assertIn('version: 4.1.1',(ROOT/'SKILL.md').read_text())
+        self.assertIn('version-4.1.1-',(ROOT/'README.md').read_text())
+        self.assertIn('## v4.1.1',(ROOT/'CHANGELOG.md').read_text())
+        self.assertIn('# Version: 4.1.1',(ROOT/'SHA256SUMS.txt').read_text())
     def test_manifest_and_secrets(self):
         for line in (ROOT/'SHA256SUMS.txt').read_text().splitlines():
             if line.startswith('#'):continue

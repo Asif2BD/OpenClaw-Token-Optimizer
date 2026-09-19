@@ -1,74 +1,101 @@
-# Token Optimizer for OpenClaw & Hermes — AI Cost Audit & Model Routing
+# Token Optimizer for OpenClaw & Hermes
 
-[![Version](https://img.shields.io/badge/version-4.1.0-brightgreen.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-4.1.1-brightgreen.svg)](CHANGELOG.md)
 [![MissionDeck](https://img.shields.io/badge/MissionDeck-ai-blueviolet)](https://missiondeck.ai)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE.txt)
 
 Built by [MissionDeck.ai](https://missiondeck.ai) · [GitHub](https://github.com/Asif2BD/OpenClaw-Token-Optimizer) · [ClawHub](https://clawhub.ai/asif2bd/skills/openclaw-token-optimizer)
 
-**Find potential token waste in your OpenClaw and Hermes agents with read-only audits of AI model routing, context size and scheduled automations.**
+**Find where your AI agent may be wasting tokens—and get a clear, safe improvement plan.**
 
-OpenClaw Token Optimizer inspects your actual model catalog and agent configuration,
-then produces local, evidence-based recommendations. It does not silently switch
-models, rewrite instructions, change schedules or promise a percentage saving.
+Large instructions, poorly matched models and repetitive AI tasks can all add overhead.
+Token Optimizer helps your OpenClaw or Hermes agent investigate those opportunities and
+explain what is worth changing. It does not silently change your setup or promise savings
+it has not measured.
 
-## What does OpenClaw Token Optimizer do?
+## Start by asking your agent
 
-- **AI model routing:** select an eligible candidate from your own ordered model policy,
-  checking catalog availability, allowlists and required capabilities.
-- **Token context analysis:** rank explicitly selected files by size and identify duplicate
-  contents. Approximate token counts help prioritize a deeper native context review.
-- **Cron and automation auditing:** review agent-turn models, timeouts, delivery intent,
-  frequency and lightContext candidates without modifying jobs.
-- **Native heartbeat support:** recognize heartbeat and systemEvent payloads without
-  incorrectly applying agent-turn checks or labeling them unknown.
-- **Honest cost reporting:** missing usage stays unknown—not zero. No hard-coded pricing
-  or unverified cost-saving estimates.
-- **Local text and JSON reports:** use offline JSON exports or the installed OpenClaw CLI.
+Once the skill is installed, say:
 
-Useful for multi-agent systems, recurring AI tasks and large instruction workspaces.
+> “Use Token Optimizer to check my setup and suggest the three most useful improvements.”
 
-## Install from ClawHub
+You can also ask:
+
+- “Are my scheduled tasks using AI when a simple script would do?”
+- “Which instruction files are taking up the most context?”
+- “Review my model choices for everyday tasks.”
+- “Check my Hermes profile for unnecessary recurring AI work.”
+
+**You do not need to begin with terminal commands.** A tool-enabled agent uses its known
+host runtime, current agent or active profile to perform read-only checks. It asks only
+when information is missing or ambiguous. The skill cannot add terminal access to an
+agent that does not have it.
+
+## What you will get
+
+- **A clear verdict:** what was inspected and what deserves attention.
+- **Prioritized suggestions:** a few useful next steps, with evidence and caveats.
+- **No surprise changes:** your models, schedules and instruction files stay untouched.
+- **Honest limits:** missing spending data stays unknown, not a misleading zero.
+
+For example, it may flag an agent task running every few minutes for review, or identify
+large instruction files. Neither proves waste by itself; your agent explains the trade-off
+before recommending a change. Actual savings require a comparable before/after measurement.
+
+## One skill, two platforms
+
+**OpenClaw:** inspects the native model catalog/status and scheduled jobs. Optional known
+config files add deeper checks. Recognizes agent tasks, commands, heartbeats and system events.
+
+**Hermes Agent:** reads the active profile's configuration and scheduled jobs. Traces model
+choices including saved creation-time defaults, skips paused jobs, and recognizes no-agent
+scripts. This is file-based auditing—not native model discovery or authentication testing.
+
+**Both:** can inspect selected instruction sizes, duplicate content and supplied usage
+figures. Model recommendations need a user policy and sufficient availability evidence.
+
+The agent selects the runtime from trusted context. If both platforms are installed and
+no active runtime is known, it asks rather than guessing. Your chosen profile takes priority.
+
+## Install
+
+Ask your agent to install the ClawHub skill **openclaw-token-optimizer** through its normal
+skill installer, or use the ClawHub CLI:
 
 ```bash
-clawhub install openclaw-token-optimizer --version 4.1.0
+clawhub install openclaw-token-optimizer --version 4.1.1
 ```
 
-Run commands from the installed skill directory. Requires **Python 3.10+**, with no
-third-party Python dependencies for OpenClaw or JSON inputs. Hermes YAML inputs need PyYAML (available in the Hermes Python environment). Offline mode does not require OpenClaw. The live adapter
-is verified against **OpenClaw 2026.9.4**; other versions are labeled unverified.
+The slug stays the same for both platforms. Keep the bundled scripts and references with
+SKILL.md. Python 3.10+ is required; YAML input additionally needs PyYAML, usually available
+in the Hermes Python environment. Nothing is installed automatically by the audit.
 
-For a manual installation, use the [versioned GitHub release](https://github.com/Asif2BD/OpenClaw-Token-Optimizer/releases/tag/v4.1.0).
+OpenClaw is tested on 2026.9.4. Hermes compatibility is tested against a pinned upstream
+cron-storage implementation in an isolated profile, without starting an agent or scheduler.
+See [Hermes compatibility](references/HERMES.md) and [agent quick start](references/QUICKSTART.md).
 
-## Hermes Agent support — read-only profile audit
+## Frequently asked before starting
 
-Use the **same skill and repository** for Hermes. The existing ClawHub slug is unchanged.
-Select the runtime explicitly; the default remains OpenClaw for backward compatibility.
-There is no runtime autodetection.
+**Will this reduce my bill automatically?** No. It finds candidates for improvement; actual
+savings depend on the changes you choose and how they perform on matched workloads.
 
-```bash
-python3 scripts/optimizer.py audit --runtime hermes --live --hermes-home /path/to/hermes-profile --json
-python3 scripts/optimizer.py plan --runtime hermes --config /path/to/config.yaml --jobs /path/to/jobs.json --json
-```
+**Will it break my working setup?** The bundled analyzer does not edit configuration,
+activate models, execute jobs or restart anything. OpenClaw read commands may contact
+configured services or update native caches.
 
-The Hermes adapter reads only the selected `config.yaml` and `cron/jobs.json`, or explicit
-exports. It never reads `.env`, authenticates, starts Hermes, executes scripts or changes
-configuration. YAML uses `yaml.safe_load`; use Hermes's Python environment or JSON exports.
+**Do I need to prepare exports?** Not for a normal audit when the host has the required
+read tools and known profile. Exports are an alternative for offline use; Hermes's separate
+model-routing function requires normalized catalog/status evidence.
 
-- Traces model precedence: job override → cron default → creation-time snapshot →
-  explicitly supplied `--hermes-model-env` → global configuration.
-- Recognizes paused jobs and `no_agent` scripts (no Hermes inference, not necessarily zero script cost).
-- Reviews frequent agent jobs and missing model/delivery evidence.
-- Shared context analysis and evidence-based routing remain available. Hermes routing requires
-  explicit normalized catalog/status exports; native discovery and authentication are **not** implemented.
+**Does it measure my complete API spending?** Not automatically. Native usage collection
+and budget alerts are not included. Missing or incomplete data is labeled clearly.
 
-Validated against pinned Hermes source with its real cron storage module in an isolated
-profile. This is **file-schema/integration compatibility**, not a full authenticated Hermes
-inference test. Profile overlays, runtime aliases/fallbacks and absent environment values
-can alter effective behavior. See [Hermes compatibility](references/HERMES.md).
-Native usage ingestion, measured dollar savings and automatic budget alerts remain future work.
+---
 
-## Quick start: audit your OpenClaw agent
+The sections below are for advanced users and maintainers. Your agent can handle these
+steps for an ordinary audit.
+
+## Advanced: run the OpenClaw audit yourself
 
 ```bash
 python3 scripts/optimizer.py audit --live --agent YOUR_AGENT --json
@@ -122,7 +149,7 @@ python3 scripts/optimizer.py budget --usage usage.json --limit 10 --json
 
 `usage.json` accepts an aggregate such as `{"costUSD":2.5,"complete":false}`.
 Without data, the result is unknown/null. **Automatic native usage ingestion, daily/weekly
-alerts and measured billing comparisons are not included in v4.1.0.**
+alerts and measured billing comparisons are not included in v4.1.1.**
 
 ## Offline audit and input formats
 
@@ -161,7 +188,7 @@ Exit **0** means analysis completed, not that no issues exist. Exit **2** means 
 input or a failed native read. Reports go to stdout; `--json` supports downstream tooling.
 `plan` intentionally emits no schema-blind patches. See [SECURITY.md](SECURITY.md).
 
-## What's fixed in v4.1.0?
+## Automation support
 
 Native **heartbeat** and **systemEvent** jobs are now recognized. The optimizer no longer
 reports them as unknown or subjects them to agent-turn-only model/timeout/context checks.

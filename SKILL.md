@@ -1,7 +1,7 @@
 ---
 name: openclaw-token-optimizer
-description: "Token optimization for OpenClaw and Hermes Agent: inspect model routing, context size, cron jobs and heartbeats with read-only diagnostics and evidence-based recommendations."
-version: 4.1.0
+description: "Find potential token waste in OpenClaw or Hermes Agent. Use when asked to reduce AI costs, review model choices, check large instructions or audit recurring tasks. Explain what matters and suggest safe next steps without changing settings."
+version: 4.1.1
 author: Asif2BD
 homepage: https://missiondeck.ai
 source: https://github.com/Asif2BD/OpenClaw-Token-Optimizer
@@ -10,77 +10,98 @@ openclaw: ">=2026.9.4"
 metadata: {"openclaw":{"emoji":"💰","requires":{"bins":["python3"]}}}
 ---
 
-# Token Optimizer for OpenClaw & Hermes
+# Make your AI agent leaner—not less capable
 
-Find potential token waste in OpenClaw agents without changing their configuration.
-Audit model availability, review automation settings, and inspect context size.
+Ask your agent:
 
-**Best for:** multi-agent setups, scheduled agent jobs, and context-heavy workspaces.
-**Output:** local text or JSON recommendations; no guaranteed savings claims.
+> “Check where I might be wasting tokens and tell me what to improve.”
 
-## Quick start
+Or try:
 
-```bash
-python3 scripts/optimizer.py audit --live --agent YOUR_AGENT --json
-```
+- “Review my scheduled tasks for unnecessary AI usage.”
+- “Which instruction files are making my context heavy?”
+- “Help me choose a suitable model for routine work.”
 
-Replace YOUR_AGENT with an existing agent ID. Offline JSON analysis is also supported.
+Works with **OpenClaw and Hermes Agent**. Your agent handles the technical steps below;
+you do not need to copy Python commands or prepare exports when the required evidence
+is already available in its environment.
+
+## What you get
+
+A short, prioritized explanation of what was checked, what deserves attention and what
+to do next. Nothing silently changes your models, instructions or schedules. Potential
+savings are opportunities to test—not a promise or a measured reduction in your bill.
 
 Built by [MissionDeck.ai](https://missiondeck.ai).
 
-## Workflow
+## Instructions for the agent
 
-1. Explain that analysis is read-only. Never claim an audit changed runtime behavior.
-2. For offline analysis, request explicit catalog/status/config/jobs JSON paths. Do not
-   search for credentials. Missing inputs are reported as incomplete coverage.
-3. For live reads, run `python3 scripts/optimizer.py audit --live --agent AGENT --json`.
-   Optional `--config PATH` reads explicit JSON config locally; it is never written or echoed.
-   Live mode invokes installed OpenClaw read commands, which may contact configured services.
-4. Review findings. `plan` uses the same inputs and emits review actions, not blind patches.
-5. To choose a model, use `route --live --agent AGENT --policy PATH --tier TIER --json`.
-   The policy's model order is authoritative. No model is activated. Prove the exact route
-   with a separately authorized canary before changing any configuration.
-6. For context, run `context SOUL.md AGENTS.md --json` using explicitly chosen files.
-   The character/4 estimate is approximate; confirm actual injected cost with native
-   `/context list` or `/context detail`. Never remove required instructions blindly.
-7. `budget --json` reports unknown without data. Optional `--usage PATH --limit USD`
-   accepts an explicit aggregate; native usage ingestion and alerts are not implemented.
+### 1. Start with what you already know
 
-## Hermes runtime
+When the user requests an audit, proceed with relevant read-only checks; do not ask them
+to restate the runtime, agent ID or active profile if trusted session context already
+provides it. Say briefly that you will inspect and recommend, without changing settings.
 
-Use `audit --runtime hermes --live --hermes-home /explicit/profile --json` to read only
-config.yaml and cron/jobs.json. Or supply explicit `--config` and `--jobs` exports.
-Never load `.env` or credentials. Never start Hermes or execute job scripts for this audit.
-Model evidence follows job → cron → creation snapshot → explicit `--hermes-model-env` →
-global default. Missing environment/overlay/authentication evidence stays unverified.
-`no_agent` avoids Hermes inference, not necessarily all script costs. Paused jobs are skipped.
-`plan` emits review actions only. Hermes `route` requires explicit normalized catalog/status;
-no native discovery is available. Use shared `context` and `budget` normally.
-Read references/HERMES.md for scope and pinned-source integration evidence.
-Default runtime remains OpenClaw; do not guess when both are installed.
+Use this decision order:
 
-## Native automation compatibility
+- An explicit user-selected runtime/profile takes priority.
+- Otherwise use the hosting session's known runtime and active agent/profile.
+- Installed binaries alone are not proof of which profile is active. If the host is unknown
+  or multiple profiles are plausible, ask one focused question rather than auditing the
+  wrong system. Continue any independent checks whose scope is already clear.
 
-Recognizes agentTurn/agent, command, heartbeat and systemEvent payloads. Agent-turn
-model, timeout and lightContext checks apply only to agent turns. Heartbeat/systemEvent
-recognition is not a full audit of their effective execution settings. Unknown future kinds
-remain visible for manual review.
+Resolve bundled script paths relative to this SKILL.md directory. Use an available Python
+3.10+ interpreter. No automatic installs, recursive home-directory searches or credential
+searches. Never print raw configuration or environment values.
 
-## Constraints
+### 2. Run the matching read-only audit
 
-- No automatic config edits, model switching, installs, paid probes, jobs or messages.
-- No fixed savings percentages, hard-coded pricing, or universal cache TTL recommendations.
-- Do not treat catalog availability as successful authentication/inference proof.
-- Unknown capabilities block required image/tool/context routing.
-- Reports omit raw config, auth profiles, prompts and commands. Review reports before sharing;
-  selected model/agent identifiers and chosen basenames may still be sensitive.
-- Do not load all skill references into every turn. Read references/PROVIDERS.md only for
-  routing or cache guidance, assets/cronjob-model-guide.md only for automation analysis.
-- The old script names are migration shims; use the v4 arguments documented in README.
+**In OpenClaw:** use the current agent ID from trusted runtime context, not the example
+name or the CLI's default. Follow `references/QUICKSTART.md` for the command. Include
+`--config` only when the active config path is already established and the audit needs it.
+If the CLI is unavailable, use exports already supplied; otherwise report the missing
+capability instead of asking the user to run a long list of commands.
 
-## Requirements and provenance
+**In Hermes:** use the active profile path already supplied by the host/user. A known
+HERMES_HOME path is profile evidence; do not dump the environment or load `.env`. Do not
+assume the default profile just because a default directory exists. The audit reads only
+config.yaml and cron/jobs.json. Prefer the existing Hermes Python environment for YAML
+support. If no cron file exists, report automation coverage as unavailable; audit the
+available config separately rather than claiming zero jobs. See references/QUICKSTART.md.
 
-Python 3.10+; standard library for OpenClaw/JSON, optional PyYAML for Hermes YAML. OpenClaw is optional for offline mode; live adapter
-verified against 2026.9.4. No claim of compatibility with every future schema.
-[GitHub](https://github.com/Asif2BD/OpenClaw-Token-Optimizer) ·
-[MissionDeck.ai Cloud](https://missiondeck.ai) · See SECURITY.md for the trust boundary.
+Do not ask for catalog/status exports for an ordinary Hermes profile audit: those are
+only needed for the separate model-routing function. Do not start Hermes or any job.
+
+### 3. Match extra checks to the question
+
+- Context: inspect only known, relevant instruction files. Character/4 estimates are not
+  actual injected tokens; use native context diagnostics if available. Never delete instructions.
+- Model choice: use the user's policy and known catalog/status evidence. Missing capability
+  metadata means unverified, not unsupported. No automatic switching or paid canary.
+- Spending: without complete usage evidence, say actual spending/savings are unknown.
+  Native usage ingestion and automatic budget alerts are not implemented.
+
+Read only the reference needed: QUICKSTART.md for commands, HERMES.md for profile/model
+precedence, PROVIDERS.md for routing/cache advice. Do not load every reference by default.
+
+### 4. Explain the result, not the machinery
+
+Lead with a plain-language verdict and at most three prioritized next steps. For each,
+explain the evidence, why it matters, and the uncertainty. Separate confirmed problems
+from review candidates; do not count every informational finding as a fault. End with
+what was not checked and confirmation that no settings were changed.
+
+Do not paste raw JSON unless requested. Offer technical details only when useful. If
+nothing actionable is found, say so. Never claim a fixed savings percentage, cheapest
+model, successful authentication or measured dollars without evidence.
+
+## Boundaries
+
+All bundled commands are diagnostic. No config edits, installs, restarts, messages, new
+jobs or credential reads. OpenClaw native reads may contact configured services and update
+native caches. Hermes support is file-based, not native catalog/authentication discovery;
+profile overlays and runtime overrides remain unverified. See SECURITY.md.
+
+Python 3.10+; optional PyYAML for YAML input. OpenClaw adapter tested on 2026.9.4; Hermes
+file compatibility is pinned in references/HERMES.md. The CLI still requires explicit
+runtime selection for Hermes; the agent chooses it from trusted context, not autodetection.

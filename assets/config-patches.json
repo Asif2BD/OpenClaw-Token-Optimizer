@@ -1,5 +1,5 @@
 {
-  "version": "4.1.0",
+  "version": "4.1.1",
   "patches": [],
   "note": "Legacy blind configuration patches removed. Use optimizer plan, validate proposed changes against your installed OpenClaw schema, and apply separately with an explicit backup and validation workflow."
 }

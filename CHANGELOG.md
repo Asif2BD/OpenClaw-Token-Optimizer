@@ -1,5 +1,12 @@
 # Changelog
 
+## v4.1.1
+
+- Lead with natural-language requests and plain-language benefits instead of Python commands.
+- Give agents a context-first OpenClaw/Hermes workflow with focused ambiguity handling.
+- Move technical steps into a lazy-loaded quick-start reference; keep all audits read-only.
+- Clarify missing profile/job evidence, installation needs and report expectations.
+
 ## v4.1.0
 
 - Add explicit Hermes read-only adapter and isolated upstream cron-store compatibility test.
